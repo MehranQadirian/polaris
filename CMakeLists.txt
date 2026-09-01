@@ -33,6 +33,7 @@ add_library(polaris_core STATIC
     core/safety/recovery/RecoveryDetector.cpp
     core/explainability/Explanation.cpp
     core/explainability/ExplanationEngine.cpp
+    core/capabilities/CapabilityRegistrySetup.cpp
 )
 target_link_libraries(polaris_core PUBLIC crypto)
 target_include_directories(polaris_core PUBLIC core)
@@ -178,3 +179,20 @@ add_test(NAME p16_explain_transaction COMMAND test_p16_explain_transaction)
 add_executable(test_p16_verbose_redaction tests/security/test_p16_verbose_redaction.cpp)
 target_link_libraries(test_p16_verbose_redaction PRIVATE polaris_core crypto)
 add_test(NAME p16_verbose_redaction COMMAND test_p16_verbose_redaction)
+
+# P19 Tests - Optimization Capability Framework
+add_executable(test_p19_registry tests/unit/test_p19_registry.cpp)
+target_link_libraries(test_p19_registry PRIVATE polaris_core crypto)
+add_test(NAME p19_registry COMMAND test_p19_registry)
+add_executable(test_p19_flatpak_capability tests/unit/test_p19_flatpak_capability.cpp)
+target_link_libraries(test_p19_flatpak_capability PRIVATE polaris_core crypto)
+add_test(NAME p19_flatpak_capability COMMAND test_p19_flatpak_capability)
+add_executable(test_p19_journal_capability tests/unit/test_p19_journal_capability.cpp)
+target_link_libraries(test_p19_journal_capability PRIVATE polaris_core crypto)
+add_test(NAME p19_journal_capability COMMAND test_p19_journal_capability)
+add_executable(test_p19_lifecycle tests/unit/test_p19_lifecycle.cpp)
+target_link_libraries(test_p19_lifecycle PRIVATE polaris_core crypto)
+add_test(NAME p19_lifecycle COMMAND test_p19_lifecycle)
+add_executable(test_p19_capability_security tests/security/test_p19_capability_security.cpp)
+target_link_libraries(test_p19_capability_security PRIVATE polaris_core crypto)
+add_test(NAME p19_capability_security COMMAND test_p19_capability_security)
