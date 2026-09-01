@@ -1,7 +1,7 @@
-# Polaris CLI — Real Workflow
+# Polaris CLI - Real Workflow
 
 **Primary interface:** CLI is first-class; Qt GUI will share the same core engine (not duplicate logic).  
-**Safety:** `READ → MEASURE → ANALYZE → EXPLAIN → RECOMMEND → PREVIEW → APPROVAL → BACKUP → APPLY → VERIFY → COMPARE → REGRESSION → AUDIT` — if any step cannot be proven safe, fails closed.
+**Safety:** `READ → MEASURE → ANALYZE → EXPLAIN → RECOMMEND → PREVIEW → APPROVAL → BACKUP → APPLY → VERIFY → COMPARE → REGRESSION → AUDIT` - if any step cannot be proven safe, fails closed.
 
 ## Build
 
@@ -21,13 +21,13 @@ No `sudo` inside Polaris, no `SUDO_ASKPASS`, no password.
 |-------|----------|--------|-------------------|-----------------|
 | **READ-ONLY** | `polaris_real --json`, `polaris_p3`, `polaris_p4 recommendations`, `polaris_p4 capabilities list`, `polaris_p4 transaction list|show|compare`, `polaris_p4 audit list`, `polaris_p4 profile show`, `polaris_p4 explain`, `polaris_p4 transaction explain`, `polaris_p4 apply --dry-run` | No | No | No |
 | **Creates transaction** | `polaris_p4 transaction preview <op>` | Creates `TX-TEST-*` under `/tmp/polaris-test-root/transactions` (fixture), audit `transaction.previewed` | No (creates `PREVIEWED`) | No |
-| **Requires explicit approval** | `polaris_p4 transaction approve <id>` | Binds `approvedBeforeHash`/`approvedTarget` (`TransactionValidator`), audit `transaction.approved` | **Yes** — this *is* the approval | No (records `APPROVED`, not `APPLIED`) |
+| **Requires explicit approval** | `polaris_p4 transaction approve <id>` | Binds `approvedBeforeHash`/`approvedTarget` (`TransactionValidator`), audit `transaction.approved` | **Yes** - this *is* the approval | No (records `APPROVED`, not `APPLIED`) |
 | **Capable of host mutation** | `polaris_p4 profile set` (writes `~/.local/state/polaris/profile.json` `0600`), future `transaction apply` via helper `org.polaris.*` `SO_PEERCRED` `flock` | Yes, but **only** via `APPROVAL→VALIDATION→BACKUP→FINAL→APPLY` and only if helper allowlist includes operation | Yes, explicit `approve` required | **Currently none privileged:** helper allowlist `ping`/`info` only (`IpcProtocol`), `flatpak-unused` `journal-vacuum` stop at `PREVIEWED` on real host (fixture file target) |
 
 ## Realistic Example Session
 
 ```bash
-# 1. Discover — always read-only, no sudo
+# 1. Discover - always read-only, no sudo
 ./build/polaris_real --json | python3 -m json.tool | head -n 60
 ./build/polaris_p3 --json | python3 -m json.tool
 ./build/polaris_p4 capabilities list --json | python3 -m json.tool
@@ -36,7 +36,7 @@ No `sudo` inside Polaris, no `SUDO_ASKPASS`, no password.
 ./build/polaris_p4 recommendations --json | python3 -m json.tool
 # → [{"id":"REC-journal-vacuum","benefit":"0.6GB","confidence":0.75}, ...] (if journal >1GB)
 
-# 2. Explain — read-only, why now / what will(not) change / rejection
+# 2. Explain - read-only, why now / what will(not) change / rejection
 ./build/polaris_p4 profile show --json
 ./build/polaris_p4 explain flatpak-unused --json | python3 -m json.tool
 # WHY NOW: flatpak reclaimable 0MB (this host hasFlatpak false) → NOT APPLICABLE
@@ -47,7 +47,7 @@ No `sudo` inside Polaris, no `SUDO_ASKPASS`, no password.
 ./build/polaris_p4 explain akonadi-disable --json | grep BLOCKED
 # → BLOCKED_BY_USER_WORKFLOW usesKMail=yes → Akonadi will remain enabled...
 
-# 3. Preview — safe, fixture, no real /run/polaris
+# 3. Preview - safe, fixture, no real /run/polaris
 # Create fixture to prove measured benefit (1.5GB):
 mkdir -p /tmp/polaris-test-root/p19
 cat > /tmp/polaris-test-root/p19/flatpak.list <<'EOF'
@@ -69,7 +69,7 @@ EOF
 ./build/polaris_p4 transaction list
 ./build/polaris_p4 transaction show TX-TEST-123 --json | python3 -m json.tool | head -n 30
 
-# 4. Approve — explicit, hash-bound, not launch==approval
+# 4. Approve - explicit, hash-bound, not launch==approval
 ./build/polaris_p4 transaction approve TX-TEST-123
 # → {"transactionId":"TX-TEST-123","approval":"APPROVED","state":"APPROVED"}
 # Audit transaction.approved, approvedBeforeHash bound to 42ba...
@@ -84,13 +84,13 @@ EOF
 ./build/polaris_p4 audit list | head
 # hash-chained, fsync per event, previousHash→eventHash, no password/secret
 
-# 5. Apply — currently fixture-locked, no privileged real-host apply
+# 5. Apply - currently fixture-locked, no privileged real-host apply
 ./build/polaris_p4 apply --dry-run flatpak-unused
 # → Dry-run MUST NOT write files, invoke privileged ops, or request password - verified
 # Real apply would be: TransactionStore::apply → VALIDATION → BACKUP (SHA-256) → FINAL VALIDATION → APPLY (atomicWrite)
 # but helper allowlist ping/info only → journal-vacuum would stay PREVIEWED on real host
 
-# 6. Verify — after hypothetical apply + reboot
+# 6. Verify - after hypothetical apply + reboot
 ./build/polaris_p4 transaction compare TX-P7-NVIDIA-470xx-20260831 --json | python3 -m json.tool
 # comparison: boot 54.106→8.515 -84% not regression, memory 4.2→5.6G, storage.free 50G→51G +1GB SUCCESS, verdict SUCCESS
 

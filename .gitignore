@@ -1,5 +1,5 @@
-# Polaris .gitignore — tailored for C++20 / CMake / Fedora / Qt (future) / Polaris runtime
-# See docs/SECURITY_AUDIT.md — no secrets, no host state, no build artifacts
+# Polaris .gitignore - tailored for C++20 / CMake / Fedora / Qt (future) / Polaris runtime
+# See docs/SECURITY_AUDIT.md - no secrets, no host state, no build artifacts
 
 # ---- Build directories ----
 build/
@@ -34,7 +34,7 @@ CTestCostData.txt
 *.out
 *.ko
 *.xz
-# Polaris executables (built from CMake, in build/ — not source; build/ already ignored)
+# Polaris executables (built from CMake, in build/ - not source; build/ already ignored)
 # Kept here only for root-level stray binaries if ever built without build/ dir
 /polaris
 /polaris_real

@@ -199,7 +199,7 @@
     },
     {
       "phase": "P10",
-      "name": "Planning — Post-Change Measurement & Regression Detection",
+      "name": "Planning - Post-Change Measurement & Regression Detection",
       "status": "PLANNED",
       "objective": "Gap analysis 10 areas, ranked 10 tasks, selected #1 Post-Change Measurement as highest-value",
       "implemented": [
@@ -222,7 +222,7 @@
         "tests/unit/test_comparison.cpp 12 categories, tests/integration/test_post_change.cpp, test_regression.cpp, test_observed_benefit.cpp (fixtures /tmp/polaris-test-root)",
         "docs/P11_POST_CHANGE_MEASUREMENT.md"
       ],
-      "tests": "9/9 0.06s (unit, real_providers, parsers, readonly, p4_security, comparison, post_change, regression, observed_benefit) — all PASS",
+      "tests": "9/9 0.06s (unit, real_providers, parsers, readonly, p4_security, comparison, post_change, regression, observed_benefit) - all PASS",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -246,7 +246,7 @@
         "core/safety/audit/AuditLog.cpp fsync per event",
         "tests/security/test_p12_stale.cpp 10 cats + TOCTOU + final + no_mut, tests/security/test_p12_idempotency.cpp 5 cats, tests/security/test_p12_statemachine.cpp 20 transitions, tests/unit/test_p12_transaction_model.cpp 3 cats (backward compat + audit)"
       ],
-      "tests": "13/13 0.11s 100% (existing 9 + p12_stale, p12_idempotency, p12_statemachine, p12_transaction_model) — all PASS, fixtures /tmp/polaris-test-root only",
+      "tests": "13/13 0.11s 100% (existing 9 + p12_stale, p12_idempotency, p12_statemachine, p12_transaction_model) - all PASS, fixtures /tmp/polaris-test-root only",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -272,7 +272,7 @@
         "cli/p4_cli.cpp extended profile show|set --json (not authorization)",
         "tests/unit/test_p13_profile_model.cpp 6 cats, tests/unit/test_p13_profile_store.cpp 6 cats, tests/security/test_p13_profile_service.cpp 6 cats, tests/unit/test_p13_profile_advisor.cpp 12 cats"
       ],
-      "tests": "17/17 0.13s 100% (existing 13 + p13_profile_model, p13_profile_store, p13_profile_service, p13_profile_advisor) — all PASS, fixtures /tmp/polaris-test-root only, real profile not touched",
+      "tests": "17/17 0.13s 100% (existing 13 + p13_profile_model, p13_profile_store, p13_profile_service, p13_profile_advisor) - all PASS, fixtures /tmp/polaris-test-root only, real profile not touched",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -300,7 +300,7 @@
         "core/safety/recovery/RecoveryDetector.h/.cpp (RecoveryInfo suggested FAILED never COMPLETED, detect scans BACKUP_CREATED/APPLYING/APPLIED/VERIFYING/AUTHORIZED → incomplete, backupExists check, audit recovery.detected, no auto-apply)",
         "tests/unit/test_p14_ipc_protocol.cpp 12 cats, tests/security/test_p14_ipc_auth.cpp 5 cats, tests/unit/test_p14_socket_security.cpp 5 cats, tests/unit/test_p14_ipc_server.cpp 4 cats, tests/unit/test_p14_lock.cpp 5 cats, tests/security/test_p14_ipc_security.cpp 12 cats, tests/unit/test_p14_recovery.cpp 4 cats"
       ],
-      "tests": "24/24 0.57s 100% (existing 17 + p14_ipc_protocol, p14_ipc_auth, p14_socket_security, p14_ipc_server, p14_lock, p14_ipc_security, p14_recovery) — all PASS, fixtures /tmp/polaris-test-root/p14 only, real helper socket not created",
+      "tests": "24/24 0.57s 100% (existing 17 + p14_ipc_protocol, p14_ipc_auth, p14_socket_security, p14_ipc_server, p14_lock, p14_ipc_security, p14_recovery) - all PASS, fixtures /tmp/polaris-test-root/p14 only, real helper socket not created",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -330,7 +330,7 @@
         "tests/unit/test_p15_regression_audit.cpp (regression 16 thresholds, observedBenefit positive/zero/negative deterministic, FileSafety 12, IpcProtocol 6, Audit chain previousHash→eventHash deterministic, fixture isolation p15_iso1 vs p15_iso2)",
         ".github/workflows/ci.yml (cmake --fresh, cmake --build, ctest, no sudo/dnf)"
       ],
-      "tests": "29/29 0.70s 100% (existing 24 + 5 P15: p15_lifecycle, p15_stale_matrix, p15_toctou_idempotency, p15_lock_recovery, p15_regression_audit) — all PASS, fixtures /tmp/polaris-test-root/p15 only, no host mutation",
+      "tests": "29/29 0.70s 100% (existing 24 + 5 P15: p15_lifecycle, p15_stale_matrix, p15_toctou_idempotency, p15_lock_recovery, p15_regression_audit) - all PASS, fixtures /tmp/polaris-test-root/p15 only, no host mutation",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -353,7 +353,7 @@
         "cli/p4_cli.cpp explain <candidate> and transaction explain <id> with --json/--verbose, audit explanation.generated (not approval)",
         "tests/unit/test_p16_explanation_model.cpp 6 cats, tests/unit/test_p16_explain_candidate.cpp 7 cats, tests/unit/test_p16_explain_transaction.cpp 8 cats, tests/security/test_p16_verbose_redaction.cpp 8 cats"
       ],
-      "tests": "33/33 0.70s 100% (existing 29 + 4 P16: explanation_model, explain_candidate, explain_transaction, verbose_redaction) — all PASS, fixtures /tmp/polaris-test-root/p16 only, no host mutation",
+      "tests": "33/33 0.70s 100% (existing 29 + 4 P16: explanation_model, explain_candidate, explain_transaction, verbose_redaction) - all PASS, fixtures /tmp/polaris-test-root/p16 only, no host mutation",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -494,7 +494,7 @@
       "reversibility": "High (akonadictl start)",
       "currentStatus": "REJECTED",
       "whetherRejected": true,
-      "reasonForRejection": "User uses KMail/Kontact — do NOT recommend disabling unless user explicitly changes decision (profile usesKMail=yes)"
+      "reasonForRejection": "User uses KMail/Kontact - do NOT recommend disabling unless user explicitly changes decision (profile usesKMail=yes)"
     },
     {
       "candidate": "NVIDIA 470xx migration",
@@ -524,7 +524,7 @@
       "candidate": "fstab / Storage",
       "currentEvidence": "3 entries, findmnt 0 errors, fstrim enabled, df 69% 102G free",
       "confidence": 0.95,
-      "expectedBenefit": "0 — already optimal",
+      "expectedBenefit": "0 - already optimal",
       "risk": "R3",
       "reversibility": "Medium",
       "currentStatus": "NO_ACTION_RECOMMENDED",
@@ -562,7 +562,7 @@
       "reversibility": "High",
       "currentStatus": "NO_ACTION_RECOMMENDED",
       "whetherRejected": false,
-      "reasonForRejection": "No evidence user doesn't use BT/printing, tiny benefit — profile usesBluetooth=unknown requires confirmation"
+      "reasonForRejection": "No evidence user doesn't use BT/printing, tiny benefit - profile usesBluetooth=unknown requires confirmation"
     },
     {
       "candidate": "Autostart",
@@ -611,22 +611,22 @@
   ],
   "safetyInvariants": [
     "READ → MEASURE → ANALYZE → EXPLAIN → RECOMMEND → PREVIEW → EXPLICIT APPROVAL → BACKUP → APPLY → VERIFY",
-    "no batch changes — one real-host transaction at a time",
-    "no launch==approval — viewing recommendation or launching Polaris is not approval",
-    "exact transaction approval — tied to transactionId + target + expected change + current file hash / unit hash / package state",
-    "beforeHash/unitHash validation — if changed after preview, approval invalidated, require new preview",
-    "backup before mutation — versioned ~/.local/state/polaris/backups/<tx>/ SHA-256 no overwrite, is_regular_file, fsync, if backup fails do not apply",
-    "rollback capability — every R2+ reversible operation declares rollbackPlan before execution",
-    "fail-closed state machine — StateMachine::isValidTransition rejects PROPOSED->APPLYING, throws logic_error, P12 added PREVIEWED/APPROVAL_REQUIRED/APPROVED → FAILED for stale",
-    "FileSafety protections — allowlist (/tmp/polaris-test-root + P5 pilot user file + /etc/fstab + ~/.local/state/polaris/profile.json + P14 IPC socket/lock allowlist), canonical, isSymlink, validatePath rejects .., ;|& `$ NUL >4096, symlink, non-allowlist, P12 TOCTOU + P13 profile + P14 socket/lock",
-    "no arbitrary shell — fixed executable paths (/usr/bin/systemctl, /usr/bin/dnf, execv separate args, no sh -c, no user input concat, bounded time/output)",
-    "no password collection — no sudo inside Polaris, no SUDO_ASKPASS, no password file, use narrowly scoped Polkit org.polaris.* auth_admin_keep, helper trust boundary Client (untrusted) | Helper (minimal, allowlist) | Polkit (OS)",
-    "no automatic reboot — rebootRequired explicit, P7 READY_FOR_REBOOT reported Reboot required, do not automatically reboot unless separately approved",
-    "no real-host mutation during discovery — ReadOnlyGuard kReadOnlyMode true openReadOnly only ifstream, test_readonly verifies stat /etc/fstab mtime unchanged",
-    "explicit approval for every real mutation — P5 TX-P5-... Hidden=true required approve with beforeHash, P6 TX-P6-...-MSSQL required approve, P7 NVIDIA-MIGRATION-CANDIDATE required explicit approval for R3, P12 binds approval to exact target/operation/hash/kernel/package, P13 profile is constraint not approval",
-    "P14 IPC security — Unix socket 0600 not world-writable, no symlink, SO_PEERCRED kernel creds not client-supplied, bounded request 64KB, no sh -c, no exec, no password, no traversal, allowlist ping/info only, no privileged mutation, TransactionLock flock exclusive, RecoveryDetector fail-closed (suggested FAILED)",
-    "P15 test/CI — table-driven deterministic isolated fixtures, no host mutation, TransactionValidator fail-closed for UNAVAILABLE, lock flock exclusive, recovery detection-only",
-    "P16 explainability — structured domain data, deterministic JSON, --verbose without secrets, WHY NOW evidence-backed, WHAT WILL CHANGE transaction-backed, WHAT WILL NOT CHANGE explicit, rejectionConditions deterministic, profile/comparison integration, never confuses approval with authorization",
+    "no batch changes - one real-host transaction at a time",
+    "no launch==approval - viewing recommendation or launching Polaris is not approval",
+    "exact transaction approval - tied to transactionId + target + expected change + current file hash / unit hash / package state",
+    "beforeHash/unitHash validation - if changed after preview, approval invalidated, require new preview",
+    "backup before mutation - versioned ~/.local/state/polaris/backups/<tx>/ SHA-256 no overwrite, is_regular_file, fsync, if backup fails do not apply",
+    "rollback capability - every R2+ reversible operation declares rollbackPlan before execution",
+    "fail-closed state machine - StateMachine::isValidTransition rejects PROPOSED->APPLYING, throws logic_error, P12 added PREVIEWED/APPROVAL_REQUIRED/APPROVED → FAILED for stale",
+    "FileSafety protections - allowlist (/tmp/polaris-test-root + P5 pilot user file + /etc/fstab + ~/.local/state/polaris/profile.json + P14 IPC socket/lock allowlist), canonical, isSymlink, validatePath rejects .., ;|& `$ NUL >4096, symlink, non-allowlist, P12 TOCTOU + P13 profile + P14 socket/lock",
+    "no arbitrary shell - fixed executable paths (/usr/bin/systemctl, /usr/bin/dnf, execv separate args, no sh -c, no user input concat, bounded time/output)",
+    "no password collection - no sudo inside Polaris, no SUDO_ASKPASS, no password file, use narrowly scoped Polkit org.polaris.* auth_admin_keep, helper trust boundary Client (untrusted) | Helper (minimal, allowlist) | Polkit (OS)",
+    "no automatic reboot - rebootRequired explicit, P7 READY_FOR_REBOOT reported Reboot required, do not automatically reboot unless separately approved",
+    "no real-host mutation during discovery - ReadOnlyGuard kReadOnlyMode true openReadOnly only ifstream, test_readonly verifies stat /etc/fstab mtime unchanged",
+    "explicit approval for every real mutation - P5 TX-P5-... Hidden=true required approve with beforeHash, P6 TX-P6-...-MSSQL required approve, P7 NVIDIA-MIGRATION-CANDIDATE required explicit approval for R3, P12 binds approval to exact target/operation/hash/kernel/package, P13 profile is constraint not approval",
+    "P14 IPC security - Unix socket 0600 not world-writable, no symlink, SO_PEERCRED kernel creds not client-supplied, bounded request 64KB, no sh -c, no exec, no password, no traversal, allowlist ping/info only, no privileged mutation, TransactionLock flock exclusive, RecoveryDetector fail-closed (suggested FAILED)",
+    "P15 test/CI - table-driven deterministic isolated fixtures, no host mutation, TransactionValidator fail-closed for UNAVAILABLE, lock flock exclusive, recovery detection-only",
+    "P16 explainability - structured domain data, deterministic JSON, --verbose without secrets, WHY NOW evidence-backed, WHAT WILL CHANGE transaction-backed, WHAT WILL NOT CHANGE explicit, rejectionConditions deterministic, profile/comparison integration, never confuses approval with authorization",
     "P19 capability registry deterministic, stale extended via preconditions map (flatpak.reclaimableBytes, journal.diskUsageBytes), no privileged apply"
   ],
   "artifacts": [
@@ -762,18 +762,18 @@
     "build": "cmake -S . -B /tmp/polaris_p19_build2 --fresh && cmake --build && ctest --output-on-failure"
   },
   "knownLimitations": [
-    "Unavailable metrics represented explicitly as available false with note, not guessed — e.g., systemd.userspace 0 -> unavailable, thermal 0 -> unavailable",
-    "Reboot-pending: framework supports rebootMarker but P11 does not auto-capture after reboot — user must run polaris transaction compare after reboot (as done for P7 manual)",
-    "Boot vs login: distinguishes isBootCritical vs background, but login time (systemd-analyze --user 596ms) is not yet in PerformanceBaseline (only systemd.userspace system) — future could add userSystemd metric",
-    "Provider fragility: RealSystemdProvider still uses execv systemctl/systemd-analyze fallback, not yet sd-bus native; RealGpuProvider glxinfo DISPLAY=:0 hack fragile headless — should use libEGL native",
-    "Benchmark synthetic: BenchmarkEngine cpu_prime is micro-benchmark, not real workload — documented as prime compute 2..2000",
+    "Unavailable metrics represented explicitly as available false with note, not guessed - e.g., systemd.userspace 0 -> unavailable, thermal 0 -> unavailable",
+    "Reboot-pending: framework supports rebootMarker but P11 does not auto-capture after reboot - user must run polaris transaction compare after reboot (as done for P7 manual)",
+    "Boot vs login: distinguishes isBootCritical vs background, but login time (systemd-analyze --user 596ms) is not yet in PerformanceBaseline (only systemd.userspace system) - future could add userSystemd metric",
+    "Provider fragility: RealSystemdProvider still uses execv systemctl/systemd-analyze fallback, not yet sd-bus native; RealGpuProvider glxinfo DISPLAY=:0 hack fragile headless - should use libEGL native",
+    "Benchmark synthetic: BenchmarkEngine cpu_prime is micro-benchmark, not real workload - documented as prime compute 2..2000",
     "No helper installed: /run/polaris/helper.sock not exists (correct for P15, helper defined but not installed, tests use /tmp/polaris-test-root/p14/p15)",
-    "Not a git repo: no branch/commit — version is 0.1.0 P15 COMPLETED",
+    "Not a git repo: no branch/commit - version is 0.1.0 P15 COMPLETED",
     "No telemetry: offline-first, no external analytics",
-    "P12 generic preconditions mocked in tests — real host collection of service enabled/active, config hash, packageStateHash, kernelVersion not yet wired to CurrentState via Real providers (future)",
-    "P14 lock advisory not mandatory — TransactionLock flock tested, but not yet enforced in TransactionStore::apply for real /run/polaris/transaction.lock (future)",
-    "P14 recovery detection-only — detects BACKUP_CREATED/APPLYING but does not auto-validate or require approval (future)",
-    "P15 CI minimal — cmake --fresh, build, ctest only, no clang-tidy/sanitizers/coverage (future)",
+    "P12 generic preconditions mocked in tests - real host collection of service enabled/active, config hash, packageStateHash, kernelVersion not yet wired to CurrentState via Real providers (future)",
+    "P14 lock advisory not mandatory - TransactionLock flock tested, but not yet enforced in TransactionStore::apply for real /run/polaris/transaction.lock (future)",
+    "P14 recovery detection-only - detects BACKUP_CREATED/APPLYING but does not auto-validate or require approval (future)",
+    "P15 CI minimal - cmake --fresh, build, ctest only, no clang-tidy/sanitizers/coverage (future)",
     "P15 validator fix for UNAVAILABLE → fail-closed (kernel/package/beforeHash empty where approved non-empty now correctly rejected)",
     "P19: Real flatpak collection on this host unavailable (flatpak not installed) -> flatpak-unused correctly NOT APPLICABLE (fixture proves 1.5GB would be RECOMMEND)",
     "P19: Journal vacuum requiresAuth true but helper not installed (IpcProtocol ping/info only) -> real-host APPLY remains disabled until helper review, transaction stays PREVIEWED",
@@ -783,7 +783,7 @@
   "nextAction": {
     "phase": null,
     "title": null,
-    "action": "STOP — P19 capability framework complete, 38/38 tests, no privileged host mutation, registry deterministic, 2 reference caps proven on fixtures; no P20 justified unless privileged helper gap proven",
+    "action": "STOP - P19 capability framework complete, 38/38 tests, no privileged host mutation, registry deterministic, 2 reference caps proven on fixtures; no P20 justified unless privileged helper gap proven",
     "explicitApprovalRequired": false
   }
 }
