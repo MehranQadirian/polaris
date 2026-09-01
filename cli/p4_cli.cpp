@@ -10,6 +10,14 @@
 #include "../core/explainability/Explanation.h"
 #include "../core/explainability/ExplanationEngine.h"
 #include "../core/domain/PerfModels.h"
+#include "../core/engines/perf/BaselineEngine.h"
+#include "../core/engines/bottleneck/BottleneckEngine.h"
+#include "../core/engines/recommend/RecommendationEngine.h"
+#include "../core/capabilities/OptimizationRegistry.h"
+#include "../core/capabilities/CapabilityRegistrySetup.h"
+#include "../core/safety/transaction/TransactionStore.h"
+#include "../core/providers/real/RealFlatpakProvider.h"
+#include "../core/providers/real/RealJournalDiskProvider.h"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -46,6 +54,83 @@ void ensureTestFixtures(){
 
 void cmd_preview(const std::string& op){
     ensureTestFixtures();
+    // P19: handle capability-backed preview
+    if(op=="flatpak-unused" || op=="journal-vacuum"){
+        polaris::capabilities::ensureCapabilitiesRegistered();
+        auto cap = polaris::capabilities::OptimizationRegistry::instance().lookup(op);
+        if(!cap){
+            std::cout << "{\"error\":\"capability not found: "+op+"\"}\n";
+            return;
+        }
+        // Collect baseline (read-only)
+        auto baseline = polaris::engines::perf::BaselineEngine::collect();
+        // For fixture demonstration, allow overriding baseline via fixture files under /tmp/polaris-test-root/p19/*
+        // Try to load fixture if exists
+        std::string fixtureFlatpakList = "/tmp/polaris-test-root/p19/flatpak.list";
+        std::string fixtureFlatpakUnused = "/tmp/polaris-test-root/p19/flatpak.unused";
+        std::string fixtureJournal = "/tmp/polaris-test-root/p19/journal.usage";
+        if(std::filesystem::exists(fixtureFlatpakList) && op=="flatpak-unused"){
+            std::ifstream f1(fixtureFlatpakList); std::string list((std::istreambuf_iterator<char>(f1)),{});
+            std::ifstream f2(fixtureFlatpakUnused); std::string unused((std::istreambuf_iterator<char>(f2)),{});
+            baseline.flatpak = polaris::providers::real::RealFlatpakProvider::fromFixture(list, unused);
+            // Ensure storage free available
+            if(baseline.storage.filesystems.empty()){
+                polaris::domain::StorageBaseline::Fs fse; fse.mount="/"; fse.freeBytes=50ULL*1024*1024*1024; fse.sizeBytes=100ULL*1024*1024*1024; fse.usedPct=50;
+                baseline.storage.filesystems.push_back(fse);
+            }
+        }
+        if(std::filesystem::exists(fixtureJournal) && op=="journal-vacuum"){
+            std::ifstream f(fixtureJournal); std::string usage((std::istreambuf_iterator<char>(f)),{});
+            baseline.journalDisk = polaris::providers::real::RealJournalDiskProvider::fromFixture(usage, "500M");
+            if(baseline.storage.filesystems.empty()){
+                polaris::domain::StorageBaseline::Fs fse2; fse2.mount="/"; fse2.freeBytes=50ULL*1024*1024*1024; fse2.sizeBytes=100ULL*1024*1024*1024; fse2.usedPct=50;
+                baseline.storage.filesystems.push_back(fse2);
+            }
+        }
+        polaris::profile::UserProfile profile;
+        std::string ppath = polaris::profile::ProfileStore::profilePath();
+        if(polaris::profile::ProfileStore::exists(ppath)){
+            try{ profile = polaris::profile::ProfileStore::load(ppath);}catch(...){}
+        }
+        if(!cap->isApplicable(baseline, profile)){
+            auto ev = cap->collect(baseline);
+            std::cout << "{\"capability\":\""<<op<<"\",\"applicable\":false,\"reason\":\""<<ev.reason<<"\",\"reclaimableMB\":"<<ev.reclaimableBytes/(1024*1024)<<"}\n";
+            std::cout << "# Not applicable on current host - no transaction previewed (correct)\n";
+            return;
+        }
+        auto ev = cap->collect(baseline);
+        if(!ev.available){
+            std::cout << "{\"capability\":\""<<op<<"\",\"available\":false,\"reason\":\""<<ev.reason<<"\"}\n";
+            return;
+        }
+        auto rec = cap->toRecommendation(ev, baseline);
+        auto cur = cap->snapshot(baseline, ev);
+        std::string txId = "TX-TEST-" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count() % 100000);
+        auto tx = cap->toTransaction(txId, rec, ev, cur);
+        tx.timestamp = nowISO();
+        // Persist via TransactionStore for stale/idempotency handling
+        polaris::safety::TransactionStore store(txStore);
+        auto res = store.create(tx);
+        if(!res.valid){
+            std::cout << "{\"error\":\""<<res.reason<<"\"}\n";
+            return;
+        }
+        AuditEvent ae{nowISO(), txId, "transaction.previewed", "mehrangh", "PENDING", "PENDING", "", tx.previews[0].diff, "", "", "", "", ""};
+        polaris::safety::AuditLog::append(ae);
+        std::cout << "{\n  \"transactionId\":\""<<txId<<"\",\n";
+        std::cout << "  \"capability\":\""<<op<<"\",\n";
+        std::cout << "  \"state\":\""<<toString(tx.state)<<"\",\n";
+        std::cout << "  \"target\":\""<<tx.target<<"\",\n";
+        std::cout << "  \"risk\":\""<<tx.riskLevel<<"\",\n";
+        std::cout << "  \"expectedBenefit\":\""<<tx.expectedBenefit<<"\",\n";
+        std::cout << "  \"reclaimableMB\":"<<ev.reclaimableBytes/(1024*1024)<<",\n";
+        std::cout << "  \"confidence\":"<<ev.confidence<<",\n";
+        std::cout << "  \"diff\":\""<<tx.previews[0].diff.substr(0,120)<<"\",\n";
+        std::cout << "  \"preconditions\":{";
+        bool first=true; for(auto &kv: ev.preconditions){ if(!first) std::cout<<","; first=false; std::cout<<"\""<<kv.first<<"\":\""<<kv.second<<"\""; } std::cout<<"}\n}\n";
+        std::cout << "# Preview via capability "<<op<<" - no writes, test fixture only\n";
+        return;
+    }
     Transaction tx;
     tx.id = "TX-TEST-" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count() % 100000);
     tx.operationId = op;
@@ -289,6 +374,49 @@ void cmd_explain_transaction(const std::string& txId, bool jsonFlag, bool verbos
     else std::cout << exp.toHuman(verbose) << "\n";
 }
 
+void cmd_recommendations(bool jsonFlag){
+    auto baseline = polaris::engines::perf::BaselineEngine::collect();
+    polaris::profile::UserProfile profile;
+    std::string ppath = polaris::profile::ProfileStore::profilePath();
+    if(polaris::profile::ProfileStore::exists(ppath)){
+        try{ profile = polaris::profile::ProfileStore::load(ppath);}catch(...){}
+    }
+    // Use bottleneck engine
+    auto bottlenecks = polaris::engines::bottleneck::BottleneckEngine::analyze(baseline);
+    auto recs = polaris::engines::recommend::RecommendationEngine::generateWithProfile(baseline, bottlenecks, profile);
+    if(jsonFlag){
+        std::cout << "[\n";
+        for(size_t i=0;i<recs.size();i++){
+            auto &r=recs[i];
+            std::cout << "  {\"id\":\""<<r.id<<"\",\"title\":\""<<r.title<<"\",\"category\":\""<<r.category<<"\",\"confidence\":"<<r.confidence<<",\"risk\":\""<<r.riskLevel<<"\",\"benefit\":\""<<r.expectedBenefit<<"\"}";
+            if(i+1<recs.size()) std::cout<<",";
+            std::cout<<"\n";
+        }
+        std::cout << "]\n";
+    } else {
+        std::cout << "Recommendations ("<<recs.size()<<"):\n";
+        for(auto &r: recs){
+            std::cout << " - "<<r.id<<" ["<<r.category<<"] "<<r.title<<" risk "<<r.riskLevel<<" confidence "<<r.confidence<<" benefit "<<r.expectedBenefit<<"\n";
+        }
+    }
+}
+void cmd_capabilities(bool jsonFlag){
+    polaris::capabilities::ensureCapabilitiesRegistered();
+    auto caps = polaris::capabilities::OptimizationRegistry::instance().capabilities();
+    if(jsonFlag){
+        std::cout << "[\n";
+        for(size_t i=0;i<caps.size();i++){
+            std::cout << "  {\"id\":\""<<caps[i]->id()<<"\",\"name\":\""<<caps[i]->name()<<"\",\"category\":\""<<caps[i]->category()<<"\",\"risk\":\""<<caps[i]->risk()<<"\",\"reboot\":"<<(caps[i]->requiresReboot()?"true":"false")<<",\"auth\":"<<(caps[i]->requiresAuth()?"true":"false")<<"}";
+            if(i+1<caps.size()) std::cout<<",";
+            std::cout<<"\n";
+        }
+        std::cout << "]\n";
+    } else {
+        std::cout << "Capabilities ("<<caps.size()<<"):\n";
+        for(auto c: caps) std::cout << " - "<<c->id()<<" ["<<c->category()<<"] "<<c->name()<<" risk "<<c->risk()<<" reboot "<<(c->requiresReboot()?"yes":"no")<<" auth "<<(c->requiresAuth()?"yes":"no")<<"\n";
+    }
+}
+
 int main(int argc, char** argv){
     std::string cmd = argc>1? argv[1] : "help";
     bool jsonFlag=false;
@@ -298,7 +426,13 @@ int main(int argc, char** argv){
         if(std::string(argv[i])=="--verbose") verboseFlag=true;
     }
     (void)jsonFlag; (void)verboseFlag;
-    if(cmd=="transaction" && argc>2){
+    if(cmd=="recommendations"){
+        cmd_recommendations(jsonFlag);
+    } else if(cmd=="capabilities" && argc>2){
+        std::string sub=argv[2];
+        if(sub=="list") cmd_capabilities(jsonFlag);
+        else std::cout << "Usage: polaris_p4 capabilities list [--json]\n";
+    } else if(cmd=="transaction" && argc>2){
         std::string sub=argv[2];
         if(sub=="list") cmd_list();
         else if(sub=="show" && argc>3) cmd_show(argv[3]);
@@ -327,12 +461,14 @@ int main(int argc, char** argv){
         std::string candidate = argv[2];
         cmd_explain_candidate(candidate, jsonFlag, verboseFlag);
     } else {
-        std::cout << "Polaris P4/P11/P12/P13/P16 - SAFE INFRASTRUCTURE READY\n";
+        std::cout << "Polaris P4/P11/P12/P13/P16/P19 - SAFE INFRASTRUCTURE READY\n";
         std::cout << "Usage:\n";
+        std::cout << "  polaris_p4 recommendations [--json]  # P19 registry + profile\n";
+        std::cout << "  polaris_p4 capabilities list [--json]\n";
         std::cout << "  polaris_p4 transaction list\n";
         std::cout << "  polaris_p4 transaction show <id> [--json]\n";
         std::cout << "  polaris_p4 transaction compare <id> [--json]\n";
-        std::cout << "  polaris_p4 transaction preview <operation>\n";
+        std::cout << "  polaris_p4 transaction preview <operation>  # dummy-test, flatpak-unused, journal-vacuum (P19 fixture)\n";
         std::cout << "  polaris_p4 transaction approve <id>\n";
         std::cout << "  polaris_p4 transaction rollback <id>  # test fixtures only\n";
         std::cout << "  polaris_p4 transaction explain <id> [--json] [--verbose]\n";
@@ -341,7 +477,8 @@ int main(int argc, char** argv){
         std::cout << "  polaris_p4 profile show [--json]\n";
         std::cout << "  polaris_p4 profile set <field> <yes|no|unknown> [--json]\n";
         std::cout << "  polaris_p4 explain <candidate> [--json] [--verbose]\n";
-        std::cout << "    candidate examples: akonadi-disable, bluetooth-disable, fstab-stale-swap\n";
+        std::cout << "    candidate examples: akonadi-disable, bluetooth-disable, fstab-stale-swap, flatpak-unused, journal-vacuum\n";
+        std::cout << "P19 registry: flatpak-unused (R1), journal-vacuum (R1) - fixture only, no privileged apply\n";
         std::cout << "P13 profile at ~/.local/state/polaris/profile.json (tests use /tmp/polaris-test-root)\n";
     }
     return 0;

@@ -1,9 +1,24 @@
 #include "RecommendationEngine.h"
+#include "../../capabilities/OptimizationRegistry.h"
+#include "../../capabilities/CapabilityRegistrySetup.h"
+#include "../../profile/UserProfile.h"
 
 namespace polaris::engines::recommend {
 
 std::vector<domain::Recommendation> RecommendationEngine::generate(const domain::PerformanceBaseline& b, const std::vector<domain::Bottleneck>& bottlenecks) {
-    (void)b;
+    profile::UserProfile defaultProfile;
+    return generateWithProfile(b, bottlenecks, defaultProfile);
+}
+
+std::vector<std::string> RecommendationEngine::capabilityIds(){
+    capabilities::ensureCapabilitiesRegistered();
+    std::vector<std::string> out;
+    for(auto c: capabilities::OptimizationRegistry::instance().capabilities()) out.push_back(c->id());
+    return out;
+}
+
+std::vector<domain::Recommendation> RecommendationEngine::generateWithProfile(const domain::PerformanceBaseline& b, const std::vector<domain::Bottleneck>& bottlenecks, const profile::UserProfile& profile) {
+    (void)profile;
     std::vector<domain::Recommendation> out;
     auto add = [&](std::string id, std::string title, std::string problem, std::vector<std::string> ev, float conf,
                    std::string benefit, std::string risk, std::string comp, std::string why, std::string alt, std::string rollback,
@@ -97,6 +112,22 @@ std::vector<domain::Recommendation> RecommendationEngine::generate(const domain:
         "No reboot (stay on current boot)",
         "N/A",
         true, false, false, "Boot");
+
+    // P19: registry-based capabilities (deterministic, evidence-backed)
+    // Adding a new capability now requires only implement + register, not editing this file.
+    capabilities::ensureCapabilitiesRegistered();
+    for(auto cap : capabilities::OptimizationRegistry::instance().capabilities()){
+        // Profile-aware applicability (always ALLOWED for flatpak/journal which are not workflow-blocked)
+        if(!cap->isApplicable(b, profile)) continue;
+        auto ev = cap->collect(b);
+        if(!ev.available) continue; // fail closed on unavailable evidence
+        if(ev.confidence < 0.5) continue; // minimal threshold
+        // Skip if benefit too low and risk not trivial? Flatpak/journal already enforce 500MB threshold in isApplicable
+        // Convert to Recommendation
+        auto rec = cap->toRecommendation(ev, b);
+        // Avoid duplicate with legacy REC-006 if registry flatpak would duplicate static: keep both but registry has evidence-backed benefit
+        out.push_back(rec);
+    }
 
     return out;
 }

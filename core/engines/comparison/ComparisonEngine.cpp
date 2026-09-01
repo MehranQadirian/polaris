@@ -181,6 +181,63 @@ domain::Comparison ComparisonEngine::compare(
             c.metrics.push_back(m);
         }
     }
+    // P19: Storage free (for flatpak/journal verification)
+    {
+        auto getFreeGb = [](const domain::PerformanceBaseline& p)->std::optional<double>{
+            if(p.storage.filesystems.empty()) return std::nullopt;
+            // Use first filesystem (/)
+            double freeGb = (double)p.storage.filesystems[0].freeBytes / (1024*1024*1024);
+            if(freeGb==0) return std::nullopt;
+            return freeGb;
+        };
+        auto b = getFreeGb(before);
+        auto a = getFreeGb(after);
+        if(b.has_value() && a.has_value()){
+            auto m = makeMetric("storage.free", b, a, "storage free decrease >0.5GB", thr.storageFreeGb, "absolute_gb", false, true, 0.85);
+            // regression is free decrease
+            c.metrics.push_back(m);
+        } else {
+            auto m = makeMetric("storage.free", std::nullopt, std::nullopt, "storage free decrease >0.5GB", thr.storageFreeGb, "absolute_gb", false, true, 0.85);
+            m.note = "unavailable: storage free not collected";
+            m.available = false;
+            c.metrics.push_back(m);
+        }
+    }
+    // P19: flatpak reclaimable
+    {
+        auto b = before.flatpak.meta.available ? std::optional<double>((double)before.flatpak.reclaimableBytes/(1024*1024*1024)) : std::nullopt;
+        auto a = after.flatpak.meta.available ? std::optional<double>((double)after.flatpak.reclaimableBytes/(1024*1024*1024)) : std::nullopt;
+        if(b.has_value() && a.has_value()){
+            auto m = makeMetric("flatpak.reclaimable", b, a, "flatpak reclaimable", 0, "absolute_gb", false, false, 0.80);
+            // Not a regression metric, just info: after should be less than before if cleaned
+            m.isHealth=false; m.isBackground=true;
+            // No regression for this metric (informational)
+            m.regression = false;
+            c.metrics.push_back(m);
+        } else {
+            auto m = makeMetric("flatpak.reclaimable", std::nullopt, std::nullopt, "flatpak reclaimable", 0, "absolute_gb", false, false, 0.80);
+            m.note = "unavailable: flatpak reclaimable not collected";
+            m.available = false;
+            c.metrics.push_back(m);
+        }
+    }
+    // P19: journal disk usage
+    {
+        auto b = before.journalDisk.meta.available ? std::optional<double>((double)before.journalDisk.diskUsageBytes/(1024*1024*1024)) : std::nullopt;
+        auto a = after.journalDisk.meta.available ? std::optional<double>((double)after.journalDisk.diskUsageBytes/(1024*1024*1024)) : std::nullopt;
+        if(b.has_value() && a.has_value()){
+            auto m = makeMetric("journal.diskUsage", b, a, "journal diskUsage", 0, "absolute_gb", false, false, 0.80);
+            m.isHealth=false; m.isBackground=true;
+            m.regression=false;
+            // If after > before, could be considered regression? But not critical, leave false
+            c.metrics.push_back(m);
+        } else {
+            auto m = makeMetric("journal.diskUsage", std::nullopt, std::nullopt, "journal diskUsage", 0, "absolute_gb", false, false, 0.80);
+            m.note = "unavailable: journal diskUsage not collected";
+            m.available = false;
+            c.metrics.push_back(m);
+        }
+    }
 
     // Determine observedBenefit and verdict
     // For P7, expected is NVIDIA functional
@@ -231,7 +288,29 @@ domain::Comparison ComparisonEngine::compare(
         for(auto &m: c.metrics){
             if(m.available && m.delta.has_value() && std::abs(*m.delta) > 1e-6) allZero = false;
         }
-        if(allZero){
+        // P19: check storage/journal/flatpak improvement
+        bool p19Improved = false;
+        std::string p19Detail;
+        for(auto &m: c.metrics){
+            if(m.metric=="storage.free" && m.delta.has_value() && *m.delta > 0.1){ p19Improved=true; p19Detail="storage.free +"+std::to_string(*m.delta)+"GB"; }
+            if(m.metric=="flatpak.reclaimable" && m.delta.has_value() && *m.delta < -0.1){ p19Improved=true; p19Detail="flatpak.reclaimable "+std::to_string(*m.delta)+"GB"; }
+            if(m.metric=="journal.diskUsage" && m.delta.has_value() && *m.delta < -0.1){ p19Improved=true; p19Detail="journal.diskUsage "+std::to_string(*m.delta)+"GB"; }
+        }
+        if(p19Improved){
+            // If expectedBenefit mentions flatpak or journal, mark SUCCESS, else IMPROVED
+            bool matchesExpected = (c.expectedBenefit.find("flatpak")!=std::string::npos && p19Detail.find("flatpak")!=std::string::npos) ||
+                                   (c.expectedBenefit.find("journal")!=std::string::npos && p19Detail.find("journal")!=std::string::npos) ||
+                                   (c.expectedBenefit.find("storage")!=std::string::npos && p19Detail.find("storage")!=std::string::npos);
+            if(matchesExpected){
+                c.verdict = domain::Verdict::SUCCESS;
+                c.verdictReason = "Observed benefit matches expected ("+p19Detail+") and no regression";
+                c.observedBenefit = p19Detail + " reclaimed";
+            } else {
+                c.verdict = domain::Verdict::IMPROVED;
+                c.verdictReason = "Benefit observed ("+p19Detail+") and no regression";
+                c.observedBenefit = p19Detail;
+            }
+        } else if(allZero){
             c.verdict = domain::Verdict::NO_CHANGE;
             c.verdictReason = "No change (idempotent, delta 0 for all metrics)";
             c.observedBenefit = "no change";

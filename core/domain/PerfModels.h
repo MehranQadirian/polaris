@@ -106,6 +106,24 @@ struct KdeBaseline {
     MetricMeta meta;
 };
 
+struct FlatpakBaseline {
+    struct Runtime { std::string id; std::string branch; std::string origin; uint64_t installedSizeBytes=0; bool isRuntime=true; std::string name; };
+    std::vector<Runtime> runtimes;
+    std::vector<Runtime> unusedRuntimes;
+    uint64_t reclaimableBytes=0;
+    int totalCount=0;
+    bool hasFlatpak=false;
+    MetricMeta meta;
+};
+
+struct JournalDiskBaseline {
+    uint64_t diskUsageBytes=0;
+    uint64_t maxUsageBytes=0;
+    uint64_t reclaimableBytes=0;
+    std::string vacuumTarget; // e.g., "500M" or "14d"
+    MetricMeta meta;
+};
+
 struct PerformanceBaseline {
     std::string id; // e.g., 2026-08-31T21:50+0330
     std::string timestamp;
@@ -118,6 +136,8 @@ struct PerformanceBaseline {
     ProcessBaseline processes;
     JournalBaseline journal;
     KdeBaseline kde;
+    FlatpakBaseline flatpak;
+    JournalDiskBaseline journalDisk;
     MetricMeta meta;
 };
 

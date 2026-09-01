@@ -10,6 +10,8 @@
 #include "../../providers/real/RealKdeProvider.h"
 #include "../../providers/real/RealProcessProvider.h"
 #include "../../providers/real/RealJournalProvider.h"
+#include "../../providers/real/RealFlatpakProvider.h"
+#include "../../providers/real/RealJournalDiskProvider.h"
 #include <chrono>
 #include <ctime>
 
@@ -201,6 +203,14 @@ public:
             s = getenv("DISPLAY"); b.kde.display = s? s : "";
             b.kde.effects = providers::real::RealKdeProvider::getDesktop().effects;
             b.kde.meta = {"", "", "env + kwinrc + plasmashell --version", "env+file+exec", 0.90f, true, ""};
+        }
+        // Flatpak (P19)
+        {
+            b.flatpak = providers::real::RealFlatpakProvider::collect();
+        }
+        // JournalDisk (P19)
+        {
+            b.journalDisk = providers::real::RealJournalDiskProvider::collect();
         }
 
         b.meta = {b.timestamp, "", "multiple", "BaselineEngine::collect()", 0.95f, true, ""};

@@ -1,6 +1,10 @@
 #include "ExplanationEngine.h"
 #include "../profile/ProfileAdvisor.h"
 #include "../domain/Comparison.h"
+#include "../capabilities/OptimizationRegistry.h"
+#include "../capabilities/CapabilityRegistrySetup.h"
+#include "../capabilities/FlatpakUnusedCapability.h"
+#include "../capabilities/JournalVacuumCapability.h"
 #include <sstream>
 #include <algorithm>
 
@@ -213,6 +217,30 @@ std::string ExplanationEngine::buildWhyNowCandidate(const std::string& candidate
     } else if(candidateId.find("bluetooth")!=std::string::npos){
         auto adv = profile::ProfileAdvisor::canConsiderBluetooth(profile);
         oss << "Measured bluetooth enabled active 2 paired devices; " << adv.reason;
+    } else if(candidateId=="flatpak-unused" || candidateId=="REC-flatpak-unused"){
+        // P19: delegate to capability
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("flatpak-unused");
+        if(cap && baseline){
+            auto ev = cap->collect(*baseline);
+            oss << cap->explainWhyNow(*baseline, ev, profile);
+        } else if(rec){
+            oss << "Flatpak unused: " << rec->expectedBenefit << " confidence " << rec->confidence << " risk " << rec->riskLevel << ".";
+            for(auto &e: rec->evidence) oss<<" evidence: "<<e<<";";
+        } else {
+            oss << "Flatpak unused candidate: measured flatpak reclaimable evidence required.";
+        }
+    } else if(candidateId=="journal-vacuum" || candidateId=="REC-journal-vacuum"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("journal-vacuum");
+        if(cap && baseline){
+            auto ev = cap->collect(*baseline);
+            oss << cap->explainWhyNow(*baseline, ev, profile);
+        } else if(rec){
+            oss << "Journal vacuum: " << rec->expectedBenefit << " confidence " << rec->confidence << " risk " << rec->riskLevel << ".";
+        } else {
+            oss << "Journal vacuum candidate: measured journal diskUsage evidence required.";
+        }
     } else {
         oss << "Candidate " << candidateId << " evidence: " << (rec?rec->evidence.size():0) << " items, expected benefit " << (rec?rec->expectedBenefit:"~1.3GB") << ", confidence " << (rec?rec->confidence:0.65) << ".";
         if(baseline) oss << " Baseline userspace " << baseline->systemd.userspace << "s.";
@@ -220,6 +248,36 @@ std::string ExplanationEngine::buildWhyNowCandidate(const std::string& candidate
     return oss.str();
 }
 std::string ExplanationEngine::buildWhatWillChangeCandidate(const std::string& candidateId, const domain::Recommendation* rec){
+    if(candidateId=="flatpak-unused" || candidateId=="REC-flatpak-unused"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("flatpak-unused");
+        if(cap){
+            domain::PerformanceBaseline dummy;
+            auto ev = cap->collect(dummy);
+            // Try to get evidence from rec if available
+            if(rec) {
+                // Use rec evidence to build string
+                std::ostringstream oss;
+                oss<<"target=flatpak-unused operation=uninstall --unused benefit "<<rec->expectedBenefit;
+                return oss.str();
+            }
+            return cap->explainWhatWillChange(ev);
+        }
+    }
+    if(candidateId=="journal-vacuum" || candidateId=="REC-journal-vacuum"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("journal-vacuum");
+        if(cap){
+            domain::PerformanceBaseline dummy;
+            auto ev = cap->collect(dummy);
+            if(rec) {
+                std::ostringstream oss;
+                oss<<"target=journal-vacuum operation=journalctl --vacuum-size=500M benefit "<<rec->expectedBenefit;
+                return oss.str();
+            }
+            return cap->explainWhatWillChange(ev);
+        }
+    }
     if(rec && !rec->affectedComponent.empty()) return "target="+rec->affectedComponent+" operation="+rec->title+" reboot="+std::string(rec->requiresReboot?"true":"false");
     if(candidateId.find("akonadi")!=std::string::npos) return "target=akonadi service, operation=disable, files=none, service=akonadi_control, expected runtime 14 agents stopped";
     if(candidateId.find("bluetooth")!=std::string::npos) return "target=bluetooth.service, operation=disable, service=bluetooth, expected 5-10M saved";
@@ -227,6 +285,16 @@ std::string ExplanationEngine::buildWhatWillChangeCandidate(const std::string& c
     return "target="+candidateId+" operation="+candidateId;
 }
 std::string ExplanationEngine::buildWhatWillNotChangeCandidate(const std::string& candidateId){
+    if(candidateId=="flatpak-unused" || candidateId=="REC-flatpak-unused"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("flatpak-unused");
+        if(cap) return cap->explainWhatWillNotChange();
+    }
+    if(candidateId=="journal-vacuum" || candidateId=="REC-journal-vacuum"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("journal-vacuum");
+        if(cap) return cap->explainWhatWillNotChange();
+    }
     std::string base = "NVIDIA 470xx remains claimed driver nvidia, Intel remains default renderer, zram remains 8G lzo-rle, no reboot if rebootRequired=false, no privileged operation unless explicitly authorized. ";
     if(candidateId.find("akonadi")!=std::string::npos) return base + "fstab remains 3 entries, bluetooth remains enabled, cups remains socket-activated.";
     if(candidateId.find("fstab")!=std::string::npos) return "Akonadi remains running 14 agents, NVIDIA 470xx remains claimed, bluetooth remains enabled, no reboot.";
@@ -235,6 +303,25 @@ std::string ExplanationEngine::buildWhatWillNotChangeCandidate(const std::string
 }
 std::vector<std::string> ExplanationEngine::buildRejectionConditionsCandidate(const std::string& candidateId, const profile::UserProfile& profile){
     std::vector<std::string> rc;
+    // P19: delegate to capability if known
+    if(candidateId=="flatpak-unused" || candidateId=="REC-flatpak-unused"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("flatpak-unused");
+        if(cap){
+            domain::PerformanceBaseline dummy;
+            auto ev = cap->collect(dummy);
+            return cap->rejectionConditions(dummy, ev, profile);
+        }
+    }
+    if(candidateId=="journal-vacuum" || candidateId=="REC-journal-vacuum"){
+        capabilities::ensureCapabilitiesRegistered();
+        auto cap = capabilities::OptimizationRegistry::instance().lookup("journal-vacuum");
+        if(cap){
+            domain::PerformanceBaseline dummy;
+            auto ev = cap->collect(dummy);
+            return cap->rejectionConditions(dummy, ev, profile);
+        }
+    }
     // Profile workflow
     if(candidateId.find("akonadi")!=std::string::npos){
         auto adv = profile::ProfileAdvisor::canConsiderAkonadi(profile);

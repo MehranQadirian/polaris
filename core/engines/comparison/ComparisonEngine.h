@@ -23,6 +23,8 @@ public:
         double availableMemGb = 1.0; // > 1 GiB decrease
         double thermalC = 15.0; // > +15°C
         bool failedUnitsNew = true; // any new failed unit
+        double storageFreeGb = 0.5; // storage free decrease >0.5GB regression (P19)
+        double journalDecreaseGb = 0.5; // not regression but benefit
     };
 
     static const Thresholds& defaultThresholds();
