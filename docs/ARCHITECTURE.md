@@ -79,3 +79,22 @@ See `docs/P14_PLAN.md` and `docs/P14_IMPLEMENTATION_REPORT.md`.
 
 See `docs/P15_PLAN.md` and `docs/P15_IMPLEMENTATION_REPORT.md`.
 
+## P19 Optimization Capability Framework (Added)
+
+- `core/capabilities/IOptimizationCapability.h` - `CapabilityEvidence` (`available`, `reason`, `evidence` sorted, `confidence`, `benefitGB`, `reclaimableBytes`, `benefitStr`, `risk`, `preconditions`, `stateHash`), `IOptimizationCapability` pure virtual (`id`, `name`, `category`, `description`, `risk`, `reversibility`, `requiresReboot/Auth`, `isApplicable`, `collect`, `toRecommendation`, `snapshot`, `toTransaction`, `verify`, `explainWhyNow/WhatWillChange/WhatWillNotChange/rejectionConditions`)
+- `core/capabilities/OptimizationRegistry.h` - `OptimizationRegistry` singleton, `registerCapability` (reject duplicate, validate `id` empty/`..`/NUL/oversized, deterministic `sort` by `id`), `capabilities()` sorted, `lookup`, `clear` for tests, `isDeterministic`
+- `core/capabilities/CapabilityRegistrySetup.h/.cpp` - `ensureCapabilitiesRegistered` idempotent, registers `FlatpakUnusedCapability` + `JournalVacuumCapability` in `id` order
+- `core/capabilities/FlatpakUnusedCapability.h` - `collect` via `b.flatpak`, thresholds `reclaimable≥500MB`, `confidence` 0.90/0.85/0.75/0.60 by GB, `isApplicable` + `toRecommendation` `REC-flatpak-unused` R1, `snapshot` `target /tmp/polaris-test-root/p19/flatpak-unused.state` + `stateHash`, `toTransaction` with `preconditions flatpak.unusedCount/reclaimable/stateHash`, `verify` via `storage.free` delta or `flatpak.reclaimable` decrease (`SUCCESS` if matches expected)
+- `core/capabilities/JournalVacuumCapability.h` - similar for `JournalDisk` (`diskUsage≥1GB`, `reclaimable≥500M`, `confidence` 0.90/0.85/0.75, `risk R1` `requiresAuth true` `org.polaris.journal.vacuum`, `verify` via `journal.diskUsage` decrease)
+- `core/providers/real/RealFlatpakProvider.h` - `safeExec` `/usr/bin/flatpak list` `fork+execv+poll` timeout 5s, `collect` parses `flatpak list --columns`, `fromFixture` deterministic for tests, `Meta` handling, no `sh -c`
+- `core/providers/real/RealJournalDiskProvider.h` - `safeExec` `/usr/bin/journalctl --disk-usage`, `parseSize`, `collect` parses `take up 3.2G`, `fromFixture`, `reclaimable = usage - 500M`
+- `core/domain/PerfModels.h` - add `FlatpakBaseline` (`runtimes`, `unusedRuntimes`, `reclaimableBytes`, `hasFlatpak`, `Meta`), `JournalDiskBaseline` (`diskUsageBytes`, `reclaimableBytes`, `vacuumTarget`, `Meta`), extend `PerformanceBaseline` with `flatpak`, `journalDisk`
+- `core/engines/perf/BaselineEngine.h` - include new providers, collect `b.flatpak`, `b.journalDisk` in `collect()`
+- `core/engines/recommend/RecommendationEngine.h/.cpp` - add `generateWithProfile(b,bottlenecks,profile)`, `capabilityIds()`, after legacy 8 iterates `OptimizationRegistry` (ensure, `isApplicable`, `collect` `available`, `confidence≥0.5`, `toRecommendation`), deterministic
+- `core/engines/comparison/ComparisonEngine.h/.cpp` - extend `Thresholds` with `storageFreeGb 0.5`, add metrics `storage.free` (`freeBytes` GB, `decrease >0.5GB` regression), `flatpak.reclaimable`, `journal.diskUsage`, verdict extended for `p19Improved` (`storage.free`/`flatpak`/`journal` delta) → `SUCCESS`/`IMPROVED`
+- `core/explainability/ExplanationEngine.cpp` - delegate `flatpak-unused`/`journal-vacuum` to capability `explainWhyNow`/`WhatWillChange`/`WhatWillNotChange`/`rejectionConditions`, redaction intact
+- `cli/p4_cli.cpp` - `cmd_preview` branch for `flatpak-unused`/`journal-vacuum` (fixture mode, `isApplicable` check, `TransactionStore::create`), `cmd_recommendations` (`generateWithProfile`), `cmd_capabilities` (`registry.capabilities`), help updated to `P19` with `flatpak-unused`/`journal-vacuum`
+- No new `TransactionValidator`/`StateMachine`/`BackupEngine`/`IpcProtocol`/`profile` weakening; all 38/38 tests, isolated `/tmp/polaris-test-root/p19_*`, no `/run/polaris` writes.
+
+See `docs/P19_PLAN.md` and `docs/P19_IMPLEMENTATION_REPORT.md`.
+

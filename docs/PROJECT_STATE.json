@@ -1,5 +1,5 @@
 {
-  "currentPhase": "P18",
+  "currentPhase": "P19",
   "currentStatus": "COMPLETED",
   "nextPhase": null,
   "nextPhaseTitle": null,
@@ -127,7 +127,7 @@
       "phase": "P6",
       "name": "L2 MSSQL Investigation + Disable",
       "status": "COMPLETED",
-      "objective": "Investigate mssql-server.service, classify PROBABLY_UNUSED 0.68\u2192UNUSED 0.92, then disable",
+      "objective": "Investigate mssql-server.service, classify PROBABLY_UNUSED 0.68→UNUSED 0.92, then disable",
       "implemented": [
         "p6_mssql_analysis.json 16K (12 evidence)",
         "p6_additional_analysis.json 7.2K (dependency graph, 0 localhost:1433, DB_CONNECTION=mysql)",
@@ -166,7 +166,7 @@
       "phase": "P8",
       "name": "Read-Only Discovery Post-P7",
       "status": "COMPLETED",
-      "objective": "Re-run baseline compare P3/P7 (userspace 54.106\u21928.515 -84%, NVRM 490\u21921), rank 7 candidates",
+      "objective": "Re-run baseline compare P3/P7 (userspace 54.106→8.515 -84%, NVRM 490→1), rank 7 candidates",
       "implemented": [
         "p8_analysis.json 14K (7 candidates ranking)",
         "docs/P8_REPORT.md 18K"
@@ -199,7 +199,7 @@
     },
     {
       "phase": "P10",
-      "name": "Planning \u2014 Post-Change Measurement & Regression Detection",
+      "name": "Planning — Post-Change Measurement & Regression Detection",
       "status": "PLANNED",
       "objective": "Gap analysis 10 areas, ranked 10 tasks, selected #1 Post-Change Measurement as highest-value",
       "implemented": [
@@ -222,7 +222,7 @@
         "tests/unit/test_comparison.cpp 12 categories, tests/integration/test_post_change.cpp, test_regression.cpp, test_observed_benefit.cpp (fixtures /tmp/polaris-test-root)",
         "docs/P11_POST_CHANGE_MEASUREMENT.md"
       ],
-      "tests": "9/9 0.06s (unit, real_providers, parsers, readonly, p4_security, comparison, post_change, regression, observed_benefit) \u2014 all PASS",
+      "tests": "9/9 0.06s (unit, real_providers, parsers, readonly, p4_security, comparison, post_change, regression, observed_benefit) — all PASS",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -241,12 +241,12 @@
       "implemented": [
         "core/safety/transaction/Transaction.h extended with beforeHash/approvedBeforeHash, beforeUnitHash/approvedUnitHash, kernelVersion/approvedKernelVersion, packageStateHash/approvedPackageStateHash, approvedTarget/approvedOperation, preconditions/approvedPreconditions, idempotencyKey/appliedAt/completedAt/validationResult (backward compatible)",
         "core/safety/transaction/TransactionValidator.h/.cpp (pure, hashString, bindApproval, validateApprovalBinding, validateForApply, finalPreconditionValidation for target/operation/beforeHash/unitHash/kernel/package/precondition/TOCTOU, fail-closed)",
-        "core/safety/transaction/TransactionStore.h/.cpp (create duplicate deterministic, approve idempotent, canApply/apply with APPROVAL\u2192VALIDATION\u2192BACKUP\u2192FINAL\u2192APPLY, COMPLETED idempotent rejection, verify idempotent, audit with expected/observed)",
-        "core/safety/transaction/StateMachine.h hardened (PREVIEWED/APPROVAL_REQUIRED/APPROVED \u2192 FAILED for stale, isTerminal helper, illegal transitions still rejected)",
+        "core/safety/transaction/TransactionStore.h/.cpp (create duplicate deterministic, approve idempotent, canApply/apply with APPROVAL→VALIDATION→BACKUP→FINAL→APPLY, COMPLETED idempotent rejection, verify idempotent, audit with expected/observed)",
+        "core/safety/transaction/StateMachine.h hardened (PREVIEWED/APPROVAL_REQUIRED/APPROVED → FAILED for stale, isTerminal helper, illegal transitions still rejected)",
         "core/safety/audit/AuditLog.cpp fsync per event",
         "tests/security/test_p12_stale.cpp 10 cats + TOCTOU + final + no_mut, tests/security/test_p12_idempotency.cpp 5 cats, tests/security/test_p12_statemachine.cpp 20 transitions, tests/unit/test_p12_transaction_model.cpp 3 cats (backward compat + audit)"
       ],
-      "tests": "13/13 0.11s 100% (existing 9 + p12_stale, p12_idempotency, p12_statemachine, p12_transaction_model) \u2014 all PASS, fixtures /tmp/polaris-test-root only",
+      "tests": "13/13 0.11s 100% (existing 9 + p12_stale, p12_idempotency, p12_statemachine, p12_transaction_model) — all PASS, fixtures /tmp/polaris-test-root only",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -266,13 +266,13 @@
       "objective": "Explicit, auditable profile for workflow constraints, recommendation constraints, explainability",
       "implemented": [
         "core/profile/UserProfile.h/.cpp (TriState UNKNOWN/YES/NO, 8 fields usesKMail/usesKontact/usesKOrganizer/usesBluetooth/usesPrinting/usesAvahi/usesCups/usesAkonadi + extra, isDefaultUnknown, ==, deterministic toJson/fromJson, knownFields sorted)",
-        "core/profile/ProfileStore.h/.cpp (profilePath ~/.local/state/polaris/profile.json, testProfilePath /tmp/polaris-test-root/profile.json, load missing\u2192unknown no auto-create, symlink/traversal/malformed throw+ audit, save atomic tmp+fsync+chmod0600+rename, FileSafety allowlist)",
+        "core/profile/ProfileStore.h/.cpp (profilePath ~/.local/state/polaris/profile.json, testProfilePath /tmp/polaris-test-root/profile.json, load missing→unknown no auto-create, symlink/traversal/malformed throw+ audit, save atomic tmp+fsync+chmod0600+rename, FileSafety allowlist)",
         "core/profile/ProfileService.h/.cpp (updateField explicit no inference, idempotent check, save + audit profile.updated with field/previous/new, unknown field rejection)",
-        "core/profile/ProfileAdvisor.h/.cpp (Decision BLOCKED_BY_USER_WORKFLOW/REQUIRES_USER_CONFIRMATION/ALLOWED_FOR_ANALYSIS, AdvisorResult reason/causingField/explicitFact/whatWillNotChange/confirmationRequired, canConsiderAkonadi/Bluetooth/Printing/Avahi with explicit yes\u2192BLOCKED, unknown\u2192REQUIRES, no\u2192ALLOWED still needs approval)",
+        "core/profile/ProfileAdvisor.h/.cpp (Decision BLOCKED_BY_USER_WORKFLOW/REQUIRES_USER_CONFIRMATION/ALLOWED_FOR_ANALYSIS, AdvisorResult reason/causingField/explicitFact/whatWillNotChange/confirmationRequired, canConsiderAkonadi/Bluetooth/Printing/Avahi with explicit yes→BLOCKED, unknown→REQUIRES, no→ALLOWED still needs approval)",
         "cli/p4_cli.cpp extended profile show|set --json (not authorization)",
         "tests/unit/test_p13_profile_model.cpp 6 cats, tests/unit/test_p13_profile_store.cpp 6 cats, tests/security/test_p13_profile_service.cpp 6 cats, tests/unit/test_p13_profile_advisor.cpp 12 cats"
       ],
-      "tests": "17/17 0.13s 100% (existing 13 + p13_profile_model, p13_profile_store, p13_profile_service, p13_profile_advisor) \u2014 all PASS, fixtures /tmp/polaris-test-root only, real profile not touched",
+      "tests": "17/17 0.13s 100% (existing 13 + p13_profile_model, p13_profile_store, p13_profile_service, p13_profile_advisor) — all PASS, fixtures /tmp/polaris-test-root only, real profile not touched",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -293,14 +293,14 @@
       "objective": "Minimal, narrowly-scoped, authenticated, fail-closed IPC with no privileged mutation, plus flock lock and fail-closed recovery detection",
       "implemented": [
         "core/ipc/IpcProtocol.h/.cpp (PROTOCOL_VERSION=1, MAX_REQUEST_SIZE=64KB, MAX_ARG_COUNT=16, MAX_ARG_SIZE=4096, validate/validateRaw with NUL/shell/traversal/oversized/unknown/password, serialize/parse deterministic, allowedOperations ping/info only, no privileged mutation)",
-        "core/ipc/IpcAuth.h/.cpp (PeerCred, getPeerCred via SO_PEERCRED Linux, isAuthorized same-user, containsSpoofedCred, unavailable \u2192 nullopt fail-closed)",
-        "core/ipc/IpcServer.h/.cpp (defaultSocketPath /run/polaris/helper.sock never created in P14, testSocketPath /tmp/polaris-test-root/p14/helper.sock, validateSocketPath/checkParentSecurity/isStaleSocket with NUL/traversal/shell/allowlist/symlink/world-writable/ownership, start with mkdir 0700 umask 0077 bind chmod 0600 listen, stop unlink, handleRequest auth\u2192spoof\u2192validate\u2192allowlist ping/info with audit TX-TEST-IPC prefix, handleNextConnection poll 5s bounded)",
+        "core/ipc/IpcAuth.h/.cpp (PeerCred, getPeerCred via SO_PEERCRED Linux, isAuthorized same-user, containsSpoofedCred, unavailable → nullopt fail-closed)",
+        "core/ipc/IpcServer.h/.cpp (defaultSocketPath /run/polaris/helper.sock never created in P14, testSocketPath /tmp/polaris-test-root/p14/helper.sock, validateSocketPath/checkParentSecurity/isStaleSocket with NUL/traversal/shell/allowlist/symlink/world-writable/ownership, start with mkdir 0700 umask 0077 bind chmod 0600 listen, stop unlink, handleRequest auth→spoof→validate→allowlist ping/info with audit TX-TEST-IPC prefix, handleNextConnection poll 5s bounded)",
         "core/ipc/IpcClient.h/.cpp (testSocketPath, send/sendRaw with poll timeout, ::send/::recv, size checks)",
         "core/safety/lock/TransactionLock.h/.cpp (defaultLockPath /run/polaris/transaction.lock never used, testLockPath /tmp/polaris-test-root/p14/transaction.lock, tryLock flock LOCK_EX|LOCK_NB 0600 FD_CLOEXEC, fail-closed on contention, parent symlink/world-writable check, audit lock.acquire/rejected/release)",
-        "core/safety/recovery/RecoveryDetector.h/.cpp (RecoveryInfo suggested FAILED never COMPLETED, detect scans BACKUP_CREATED/APPLYING/APPLIED/VERIFYING/AUTHORIZED \u2192 incomplete, backupExists check, audit recovery.detected, no auto-apply)",
+        "core/safety/recovery/RecoveryDetector.h/.cpp (RecoveryInfo suggested FAILED never COMPLETED, detect scans BACKUP_CREATED/APPLYING/APPLIED/VERIFYING/AUTHORIZED → incomplete, backupExists check, audit recovery.detected, no auto-apply)",
         "tests/unit/test_p14_ipc_protocol.cpp 12 cats, tests/security/test_p14_ipc_auth.cpp 5 cats, tests/unit/test_p14_socket_security.cpp 5 cats, tests/unit/test_p14_ipc_server.cpp 4 cats, tests/unit/test_p14_lock.cpp 5 cats, tests/security/test_p14_ipc_security.cpp 12 cats, tests/unit/test_p14_recovery.cpp 4 cats"
       ],
-      "tests": "24/24 0.57s 100% (existing 17 + p14_ipc_protocol, p14_ipc_auth, p14_socket_security, p14_ipc_server, p14_lock, p14_ipc_security, p14_recovery) \u2014 all PASS, fixtures /tmp/polaris-test-root/p14 only, real helper socket not created",
+      "tests": "24/24 0.57s 100% (existing 17 + p14_ipc_protocol, p14_ipc_auth, p14_socket_security, p14_ipc_server, p14_lock, p14_ipc_security, p14_recovery) — all PASS, fixtures /tmp/polaris-test-root/p14 only, real helper socket not created",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -322,15 +322,15 @@
       "status": "COMPLETED",
       "objective": "Strengthen automated verification, regression protection, transaction lifecycle, rollback/crash-recovery, concurrency, isolated fixtures + CI",
       "implemented": [
-        "TransactionValidator fail-closed fix for UNAVAILABLE (kernel/package/beforeHash empty where approved non-empty \u2192 unverifiable)",
-        "tests/unit/test_p15_lifecycle.cpp (table-driven StateMachine valid 16 + rejected 12, stale\u2192FAILED, unverifiable\u2192FAILED)",
-        "tests/unit/test_p15_stale_matrix.cpp (7 fields \u00d73 states 19 cases UNCHANGED accepted CHANGED/UNAVAILABLE rejected, multi-field deterministic)",
+        "TransactionValidator fail-closed fix for UNAVAILABLE (kernel/package/beforeHash empty where approved non-empty → unverifiable)",
+        "tests/unit/test_p15_lifecycle.cpp (table-driven StateMachine valid 16 + rejected 12, stale→FAILED, unverifiable→FAILED)",
+        "tests/unit/test_p15_stale_matrix.cpp (7 fields ×3 states 19 cases UNCHANGED accepted CHANGED/UNAVAILABLE rejected, multi-field deterministic)",
         "tests/unit/test_p15_toctou_idempotency.cpp (TOCTOU between gates no mutation backup preserved FAILED, symlink TOCTOU, idempotency create/approve/apply/verify + reload via exists)",
         "tests/unit/test_p15_lock_recovery.cpp (lock exclusive 2/4/3 threads table, FD_CLOEXEC, stale parent, RecoveryDetector 10 states, scan BACKUP_CREATED/APPLYING detected COMPLETED not, never auto-apply, rollback backup stable)",
-        "tests/unit/test_p15_regression_audit.cpp (regression 16 thresholds, observedBenefit positive/zero/negative deterministic, FileSafety 12, IpcProtocol 6, Audit chain previousHash\u2192eventHash deterministic, fixture isolation p15_iso1 vs p15_iso2)",
+        "tests/unit/test_p15_regression_audit.cpp (regression 16 thresholds, observedBenefit positive/zero/negative deterministic, FileSafety 12, IpcProtocol 6, Audit chain previousHash→eventHash deterministic, fixture isolation p15_iso1 vs p15_iso2)",
         ".github/workflows/ci.yml (cmake --fresh, cmake --build, ctest, no sudo/dnf)"
       ],
-      "tests": "29/29 0.70s 100% (existing 24 + 5 P15: p15_lifecycle, p15_stale_matrix, p15_toctou_idempotency, p15_lock_recovery, p15_regression_audit) \u2014 all PASS, fixtures /tmp/polaris-test-root/p15 only, no host mutation",
+      "tests": "29/29 0.70s 100% (existing 24 + 5 P15: p15_lifecycle, p15_stale_matrix, p15_toctou_idempotency, p15_lock_recovery, p15_regression_audit) — all PASS, fixtures /tmp/polaris-test-root/p15 only, no host mutation",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -349,11 +349,11 @@
       "objective": "Make recommendations, previews, rejections, verification clearly explainable (14 questions)",
       "implemented": [
         "core/explainability/Explanation.h/.cpp (CandidateKind, DecisionKind, 22 fields deterministic, toJson sorted, fromJson strict, toHuman verbose redacted)",
-        "core/explainability/ExplanationEngine.h/.cpp (explainCandidate with ProfileAdvisor BLOCKED/REQUIRES/ALLOWED + Comparison, explainTransaction lifecycle PREVIEWED\u2192FAILED with expected/observed/backup/rollback, explainComparison expected vs observed, whyNow/whatWillChange/whatWillNotChange/rejectionConditions deterministic)",
+        "core/explainability/ExplanationEngine.h/.cpp (explainCandidate with ProfileAdvisor BLOCKED/REQUIRES/ALLOWED + Comparison, explainTransaction lifecycle PREVIEWED→FAILED with expected/observed/backup/rollback, explainComparison expected vs observed, whyNow/whatWillChange/whatWillNotChange/rejectionConditions deterministic)",
         "cli/p4_cli.cpp explain <candidate> and transaction explain <id> with --json/--verbose, audit explanation.generated (not approval)",
         "tests/unit/test_p16_explanation_model.cpp 6 cats, tests/unit/test_p16_explain_candidate.cpp 7 cats, tests/unit/test_p16_explain_transaction.cpp 8 cats, tests/security/test_p16_verbose_redaction.cpp 8 cats"
       ],
-      "tests": "33/33 0.70s 100% (existing 29 + 4 P16: explanation_model, explain_candidate, explain_transaction, verbose_redaction) \u2014 all PASS, fixtures /tmp/polaris-test-root/p16 only, no host mutation",
+      "tests": "33/33 0.70s 100% (existing 29 + 4 P16: explanation_model, explain_candidate, explain_transaction, verbose_redaction) — all PASS, fixtures /tmp/polaris-test-root/p16 only, no host mutation",
       "realHostModifications": 0,
       "reboot": false,
       "artifacts": [
@@ -375,7 +375,7 @@
         "ProfileAdvisor: akonadi-disable BLOCKED_BY_USER_WORKFLOW (handoff usesKMail=yes) or REQUIRES (file unknown), bluetooth/avahi/cups REQUIRES (unknown) with evidence in use",
         "Explainability: polaris_p4 explain bluetooth-disable --json REQUIRES_USER_CONFIRMATION whyNow bluetooth 2 paired, whatWillChange target bluetooth.service, whatWillNotChange NVIDIA 470xx remains, rejectionConditions profile unknown + stale + regression",
         "Candidate scoring 7 candidates: akonadi REJECTED, bluetooth NO_ACTION (5-10M tiny, confidence 0.40, requires confirmation), avahi NO_ACTION, cups NO_ACTION, plocate NO_ACTION (0s boot-critical), dnf-makecache NO_ACTION, autostart NO_ACTION",
-        "Selected exactly ONE highest-value candidate bluetooth-disable but expected benefit negligible (5-10M, 0s boot-critical) \u2192 NO_ACTION_RECOMMENDED, no PREVIEWED transaction created, stop at RECOMMEND boundary, preserve safety invariants"
+        "Selected exactly ONE highest-value candidate bluetooth-disable but expected benefit negligible (5-10M, 0s boot-critical) → NO_ACTION_RECOMMENDED, no PREVIEWED transaction created, stop at RECOMMEND boundary, preserve safety invariants"
       ],
       "tests": "No new tests (read-only discovery, existing 33/33 still pass, no host mutation)",
       "realHostModifications": 0,
@@ -392,11 +392,11 @@
       "objective": "Final engineering-grade assessment: what actually changed, measurable benefit, expected vs observed, rejected candidates, regression, current host state, safety guarantees, limitations, verdict PROJECT_COMPLETE_WITH_LIMITATIONS",
       "implemented": [
         "Final host validation 2026-09-01 03:25: systemd-analyze 8.515s, critical-chain plasmalogin 7.301s not plocate 21s, systemctl --failed 1 drkonqi not mssql, free 5.6Gi avail, zram 0B, sensors 60C, lspci CLAIMED driver nvidia, modinfo 470.256.02, nvidia-smi 470.256.02 52C, glxinfo Mesa Intel, PRIME NVIDIA GeForce MX130, KDE plasmshell active, akonadictl running 14 agents, mssql disabled inactive, fstab 3 entries #39b0 swap commented 2026-08-31 21:19, helper.sock not exists, profile.json not exists",
-        "Final baseline comparison P3 54.106s vs P18 8.515s -84% not regression, available 4.2\u21925.6 +1.4GB not regression, swap 1.6\u21920, thermal 67\u219260 -7C not +15C, nvidia 0\u21921 not regression, failed 1\u21921 different unit INCONCLUSIVE (mssql 1\u21920 not regression, drkonqi 0\u21921 unrelated), zram 1.6\u21920, load/journal NOT MEASURED",
-        "Transaction ROI table: TX-P5 NO_OP already Hidden=true 101, TX-P6 mssql disable 713M 9.192s \u2192 disabled inactive verified after reboot 0 failed, TX-P7 NVIDIA 470.256.02 CLAIMED PRIME vs 610 UNCLAIMED 490\u21921, plus 7 rejected candidates (akonadi REJECTED, bluetooth 2 paired 5-10M NO_ACTION, avahi kdeconnect, cups socket, plocate 21s not critical-chain, dnf-makecache 0s, autostart Hidden=true)",
-        "Campaign 2 P17 NO_ACTION_RECOMMENDED: akonadi BLOCKED (handoff usesKMail=yes), bluetooth 2 paired REQUIRES 5-10M tiny, scored 7 candidates 0s boot-critical or tiny REQUIRES/REJECTED \u2192 NO_ACTION, exactly ONE considered but negligible, no PREVIEWED transaction",
-        "Final regression NO REGRESSION DETECTED for Polaris (boot -84%, available +1.4GB, thermal -7C, nvidia 0\u21921, swap 1.6\u21920, zram 0B), NOT MEASURED for load/journal, INCONCLUSIVE for failedCount but mssql 0 is not regression",
-        "Safety assessment: READ\u2192...\u2192AUDIT demonstrated for P6/P7, stale-preview 7 fields, TOCTOU, idempotency, backup-before-mutation, fail-closed StateMachine, FileSafety 9 checks, IPC allowlist ping/info, SO_PEERCRED same-user, flock, recovery detection-only suggested FAILED, audit hash chain fsync, profile, explainability deterministic",
+        "Final baseline comparison P3 54.106s vs P18 8.515s -84% not regression, available 4.2→5.6 +1.4GB not regression, swap 1.6→0, thermal 67→60 -7C not +15C, nvidia 0→1 not regression, failed 1→1 different unit INCONCLUSIVE (mssql 1→0 not regression, drkonqi 0→1 unrelated), zram 1.6→0, load/journal NOT MEASURED",
+        "Transaction ROI table: TX-P5 NO_OP already Hidden=true 101, TX-P6 mssql disable 713M 9.192s → disabled inactive verified after reboot 0 failed, TX-P7 NVIDIA 470.256.02 CLAIMED PRIME vs 610 UNCLAIMED 490→1, plus 7 rejected candidates (akonadi REJECTED, bluetooth 2 paired 5-10M NO_ACTION, avahi kdeconnect, cups socket, plocate 21s not critical-chain, dnf-makecache 0s, autostart Hidden=true)",
+        "Campaign 2 P17 NO_ACTION_RECOMMENDED: akonadi BLOCKED (handoff usesKMail=yes), bluetooth 2 paired REQUIRES 5-10M tiny, scored 7 candidates 0s boot-critical or tiny REQUIRES/REJECTED → NO_ACTION, exactly ONE considered but negligible, no PREVIEWED transaction",
+        "Final regression NO REGRESSION DETECTED for Polaris (boot -84%, available +1.4GB, thermal -7C, nvidia 0→1, swap 1.6→0, zram 0B), NOT MEASURED for load/journal, INCONCLUSIVE for failedCount but mssql 0 is not regression",
+        "Safety assessment: READ→...→AUDIT demonstrated for P6/P7, stale-preview 7 fields, TOCTOU, idempotency, backup-before-mutation, fail-closed StateMachine, FileSafety 9 checks, IPC allowlist ping/info, SO_PEERCRED same-user, flock, recovery detection-only suggested FAILED, audit hash chain fsync, profile, explainability deterministic",
         "Test/build validation: clean cmake -S . -B /tmp/polaris_p18_build --fresh, cmake --build, ctest 33/33 0.70s 100% (P4-P16 33 tests, P17/P18 read-only), no host mutation, fixture isolation /tmp/polaris-test-root",
         "Documentation: docs/P18_FINAL_REPORT.md 15K + docs/P18_FINAL_STATE.json (phase P18 status COMPLETED verdict PROJECT_COMPLETE_WITH_LIMITATIONS)"
       ],
@@ -406,6 +406,43 @@
       "artifacts": [
         "docs/P18_FINAL_REPORT.md",
         "docs/P18_FINAL_STATE.json"
+      ]
+    },
+    {
+      "phase": "P19",
+      "name": "Optimization Capability Framework",
+      "status": "COMPLETED",
+      "objective": "Registerable, evidence-backed optimization capabilities with measured benefit, stale protection, verification and explainability",
+      "implemented": [
+        "core/capabilities/IOptimizationCapability.h (CapabilityEvidence, IOptimizationCapability pure virtual)",
+        "core/capabilities/OptimizationRegistry.h (singleton, duplicate reject, deterministic sort by id)",
+        "core/capabilities/CapabilityRegistrySetup.h/.cpp (ensureCapabilitiesRegistered, flatpak-unused + journal-vacuum)",
+        "core/capabilities/FlatpakUnusedCapability.h (R1, 500MB threshold, 0.90/0.85 confidence, flatpak uninstall --unused, rollback flatpak install, verify via storage.free)",
+        "core/capabilities/JournalVacuumCapability.h (R1, 1GB/500M thresholds, journalctl --vacuum-size=500M, org.polaris.journal.vacuum, verify via journal.diskUsage)",
+        "core/providers/real/RealFlatpakProvider.h (safeExec fork+execv, collect, fromFixture, no sh -c)",
+        "core/providers/real/RealJournalDiskProvider.h (safeExec, parseSize, fromFixture)",
+        "core/domain/PerfModels.h extended FlatpakBaseline/JournalDiskBaseline in PerformanceBaseline",
+        "core/engines/perf/BaselineEngine.h collect flatpak+JournalDisk",
+        "core/engines/recommend/RecommendationEngine.h/.cpp generateWithProfile + registry iteration (deterministic, confidence>=0.5)",
+        "core/engines/comparison/ComparisonEngine.h/.cpp thresholds storageFreeGb 0.5, metrics storage.free/flatpak.reclaimable/journal.diskUsage, p19Improved SUCCESS/IMPROVED",
+        "core/explainability/ExplanationEngine.cpp delegate flatpak/journal to capability explain*",
+        "cli/p4_cli.cpp recommendations/capabilities/transaction preview flatpak-unused|journal-vacuum fixture mode"
+      ],
+      "tests": "38/38 1.33s 100% (existing 33 + 5 P19: p19_registry 6 cats, p19_flatpak 9 cats, p19_journal 10 cats, p19_lifecycle 7 cats, p19_capability_security 6 cats) - fixtures /tmp/polaris-test-root/p19_* only, no host mutation",
+      "realHostModifications": 0,
+      "reboot": false,
+      "artifacts": [
+        "IOptimizationCapability.*",
+        "OptimizationRegistry.*",
+        "FlatpakUnusedCapability.*",
+        "JournalVacuumCapability.*",
+        "RealFlatpakProvider.*",
+        "RealJournalDiskProvider.*",
+        "test_p19_* 5 suites (38 total)",
+        "docs/P19_PLAN.md",
+        "docs/P19_IMPLEMENTATION_REPORT.md",
+        "ARCHITECTURE.md updated",
+        "ROADMAP.md updated"
       ]
     }
   ],
@@ -457,7 +494,7 @@
       "reversibility": "High (akonadictl start)",
       "currentStatus": "REJECTED",
       "whetherRejected": true,
-      "reasonForRejection": "User uses KMail/Kontact \u2014 do NOT recommend disabling unless user explicitly changes decision (profile usesKMail=yes)"
+      "reasonForRejection": "User uses KMail/Kontact — do NOT recommend disabling unless user explicitly changes decision (profile usesKMail=yes)"
     },
     {
       "candidate": "NVIDIA 470xx migration",
@@ -487,7 +524,7 @@
       "candidate": "fstab / Storage",
       "currentEvidence": "3 entries, findmnt 0 errors, fstrim enabled, df 69% 102G free",
       "confidence": 0.95,
-      "expectedBenefit": "0 \u2014 already optimal",
+      "expectedBenefit": "0 — already optimal",
       "risk": "R3",
       "reversibility": "Medium",
       "currentStatus": "NO_ACTION_RECOMMENDED",
@@ -525,7 +562,7 @@
       "reversibility": "High",
       "currentStatus": "NO_ACTION_RECOMMENDED",
       "whetherRejected": false,
-      "reasonForRejection": "No evidence user doesn't use BT/printing, tiny benefit \u2014 profile usesBluetooth=unknown requires confirmation"
+      "reasonForRejection": "No evidence user doesn't use BT/printing, tiny benefit — profile usesBluetooth=unknown requires confirmation"
     },
     {
       "candidate": "Autostart",
@@ -548,26 +585,49 @@
       "currentStatus": "NO_ACTION_RECOMMENDED",
       "whetherRejected": false,
       "reasonForRejection": "Already improved via nvidia/mssql"
+    },
+    {
+      "candidate": "Flatpak unused runtimes",
+      "currentEvidence": "flatpak not installed or 0 unused on this host (fixture 900M reclaimable proven), registry flatpak-unused R1 500MB threshold",
+      "confidence": 0.85,
+      "expectedBenefit": "1.5 GB disk if unused >500MB (fixture), measured benefitGB",
+      "risk": "R1",
+      "reversibility": "High (flatpak install <runtime>)",
+      "currentStatus": "NOT APPLICABLE ON THIS HOST (no unused, or flatpak not installed) - reference capability proven on fixtures",
+      "whetherRejected": false,
+      "reasonForRejection": "No unused runtimes <500MB threshold on this host; fixture tests show 1.5GB reclaimable would be RECOMMEND"
+    },
+    {
+      "candidate": "Journal vacuum",
+      "currentEvidence": "journal diskUsage 3.2G fixture -> 2.7GB reclaimable to 500M; current host journal 400M <1GB not worthwhile",
+      "confidence": 0.9,
+      "expectedBenefit": "2.7 GB journal if usage>1GB (fixture), measured reclaimableBytes",
+      "risk": "R1",
+      "reversibility": "Limited (old logs >14d lost)",
+      "currentStatus": "NOT APPLICABLE ON THIS HOST (usage <1GB) - reference capability proven on fixtures",
+      "whetherRejected": false,
+      "reasonForRejection": "Current host journal <1GB, reclaimable <500MB threshold, so NO_ACTION; fixture 3.2G would be RECOMMEND"
     }
   ],
   "safetyInvariants": [
-    "READ \u2192 MEASURE \u2192 ANALYZE \u2192 EXPLAIN \u2192 RECOMMEND \u2192 PREVIEW \u2192 EXPLICIT APPROVAL \u2192 BACKUP \u2192 APPLY \u2192 VERIFY",
-    "no batch changes \u2014 one real-host transaction at a time",
-    "no launch==approval \u2014 viewing recommendation or launching Polaris is not approval",
-    "exact transaction approval \u2014 tied to transactionId + target + expected change + current file hash / unit hash / package state",
-    "beforeHash/unitHash validation \u2014 if changed after preview, approval invalidated, require new preview",
-    "backup before mutation \u2014 versioned ~/.local/state/polaris/backups/<tx>/ SHA-256 no overwrite, is_regular_file, fsync, if backup fails do not apply",
-    "rollback capability \u2014 every R2+ reversible operation declares rollbackPlan before execution",
-    "fail-closed state machine \u2014 StateMachine::isValidTransition rejects PROPOSED->APPLYING, throws logic_error, P12 added PREVIEWED/APPROVAL_REQUIRED/APPROVED \u2192 FAILED for stale",
-    "FileSafety protections \u2014 allowlist (/tmp/polaris-test-root + P5 pilot user file + /etc/fstab + ~/.local/state/polaris/profile.json + P14 IPC socket/lock allowlist), canonical, isSymlink, validatePath rejects .., ;|& `$ NUL >4096, symlink, non-allowlist, P12 TOCTOU + P13 profile + P14 socket/lock",
-    "no arbitrary shell \u2014 fixed executable paths (/usr/bin/systemctl, /usr/bin/dnf, execv separate args, no sh -c, no user input concat, bounded time/output)",
-    "no password collection \u2014 no sudo inside Polaris, no SUDO_ASKPASS, no password file, use narrowly scoped Polkit org.polaris.* auth_admin_keep, helper trust boundary Client (untrusted) | Helper (minimal, allowlist) | Polkit (OS)",
-    "no automatic reboot \u2014 rebootRequired explicit, P7 READY_FOR_REBOOT reported Reboot required, do not automatically reboot unless separately approved",
-    "no real-host mutation during discovery \u2014 ReadOnlyGuard kReadOnlyMode true openReadOnly only ifstream, test_readonly verifies stat /etc/fstab mtime unchanged",
-    "explicit approval for every real mutation \u2014 P5 TX-P5-... Hidden=true required approve with beforeHash, P6 TX-P6-...-MSSQL required approve, P7 NVIDIA-MIGRATION-CANDIDATE required explicit approval for R3, P12 binds approval to exact target/operation/hash/kernel/package, P13 profile is constraint not approval",
-    "P14 IPC security \u2014 Unix socket 0600 not world-writable, no symlink, SO_PEERCRED kernel creds not client-supplied, bounded request 64KB, no sh -c, no exec, no password, no traversal, allowlist ping/info only, no privileged mutation, TransactionLock flock exclusive, RecoveryDetector fail-closed (suggested FAILED)",
-    "P15 test/CI \u2014 table-driven deterministic isolated fixtures, no host mutation, TransactionValidator fail-closed for UNAVAILABLE, lock flock exclusive, recovery detection-only",
-    "P16 explainability \u2014 structured domain data, deterministic JSON, --verbose without secrets, WHY NOW evidence-backed, WHAT WILL CHANGE transaction-backed, WHAT WILL NOT CHANGE explicit, rejectionConditions deterministic, profile/comparison integration, never confuses approval with authorization"
+    "READ → MEASURE → ANALYZE → EXPLAIN → RECOMMEND → PREVIEW → EXPLICIT APPROVAL → BACKUP → APPLY → VERIFY",
+    "no batch changes — one real-host transaction at a time",
+    "no launch==approval — viewing recommendation or launching Polaris is not approval",
+    "exact transaction approval — tied to transactionId + target + expected change + current file hash / unit hash / package state",
+    "beforeHash/unitHash validation — if changed after preview, approval invalidated, require new preview",
+    "backup before mutation — versioned ~/.local/state/polaris/backups/<tx>/ SHA-256 no overwrite, is_regular_file, fsync, if backup fails do not apply",
+    "rollback capability — every R2+ reversible operation declares rollbackPlan before execution",
+    "fail-closed state machine — StateMachine::isValidTransition rejects PROPOSED->APPLYING, throws logic_error, P12 added PREVIEWED/APPROVAL_REQUIRED/APPROVED → FAILED for stale",
+    "FileSafety protections — allowlist (/tmp/polaris-test-root + P5 pilot user file + /etc/fstab + ~/.local/state/polaris/profile.json + P14 IPC socket/lock allowlist), canonical, isSymlink, validatePath rejects .., ;|& `$ NUL >4096, symlink, non-allowlist, P12 TOCTOU + P13 profile + P14 socket/lock",
+    "no arbitrary shell — fixed executable paths (/usr/bin/systemctl, /usr/bin/dnf, execv separate args, no sh -c, no user input concat, bounded time/output)",
+    "no password collection — no sudo inside Polaris, no SUDO_ASKPASS, no password file, use narrowly scoped Polkit org.polaris.* auth_admin_keep, helper trust boundary Client (untrusted) | Helper (minimal, allowlist) | Polkit (OS)",
+    "no automatic reboot — rebootRequired explicit, P7 READY_FOR_REBOOT reported Reboot required, do not automatically reboot unless separately approved",
+    "no real-host mutation during discovery — ReadOnlyGuard kReadOnlyMode true openReadOnly only ifstream, test_readonly verifies stat /etc/fstab mtime unchanged",
+    "explicit approval for every real mutation — P5 TX-P5-... Hidden=true required approve with beforeHash, P6 TX-P6-...-MSSQL required approve, P7 NVIDIA-MIGRATION-CANDIDATE required explicit approval for R3, P12 binds approval to exact target/operation/hash/kernel/package, P13 profile is constraint not approval",
+    "P14 IPC security — Unix socket 0600 not world-writable, no symlink, SO_PEERCRED kernel creds not client-supplied, bounded request 64KB, no sh -c, no exec, no password, no traversal, allowlist ping/info only, no privileged mutation, TransactionLock flock exclusive, RecoveryDetector fail-closed (suggested FAILED)",
+    "P15 test/CI — table-driven deterministic isolated fixtures, no host mutation, TransactionValidator fail-closed for UNAVAILABLE, lock flock exclusive, recovery detection-only",
+    "P16 explainability — structured domain data, deterministic JSON, --verbose without secrets, WHY NOW evidence-backed, WHAT WILL CHANGE transaction-backed, WHAT WILL NOT CHANGE explicit, rejectionConditions deterministic, profile/comparison integration, never confuses approval with authorization",
+    "P19 capability registry deterministic, stale extended via preconditions map (flatpak.reclaimableBytes, journal.diskUsageBytes), no privileged apply"
   ],
   "artifacts": [
     "docs/PROJECT_HANDOFF.md (updated for P14)",
@@ -648,7 +708,16 @@
     "docs/P16_PLAN.md 12K",
     "docs/P16_IMPLEMENTATION_REPORT.md 15K",
     "ExplanationEngine.*",
-    "test_p16_* 4 suites (33 total)"
+    "test_p16_* 4 suites (33 total)",
+    "docs/P19_PLAN.md 12K",
+    "docs/P19_IMPLEMENTATION_REPORT.md 15K",
+    "IOptimizationCapability.*",
+    "OptimizationRegistry.*",
+    "FlatpakUnusedCapability.*",
+    "JournalVacuumCapability.*",
+    "RealFlatpakProvider.*",
+    "RealJournalDiskProvider.*",
+    "test_p19_* 5 suites (38 total)"
   ],
   "tests": {
     "unit": "Passed",
@@ -684,28 +753,37 @@
     "p16_explain_candidate": "Passed (7 cats)",
     "p16_explain_transaction": "Passed (8 cats)",
     "p16_verbose_redaction": "Passed (8 cats)",
-    "total": "33/33 0.70s 100% (P18 read-only, no new tests, existing 33 still pass)",
-    "build": "cmake -S ~/Documents/lin-opt -B /tmp/polaris_p16_build --fresh && cmake --build && ctest --output-on-failure"
+    "p19_registry": "Passed (6 cats)",
+    "p19_flatpak_capability": "Passed (9 cats)",
+    "p19_journal_capability": "Passed (10 cats)",
+    "p19_lifecycle": "Passed (7 cats)",
+    "p19_capability_security": "Passed (6 cats)",
+    "total": "38/38 1.33s 100% (P19 registry + 2 caps + 38 tests, no host mutation)",
+    "build": "cmake -S . -B /tmp/polaris_p19_build2 --fresh && cmake --build && ctest --output-on-failure"
   },
   "knownLimitations": [
-    "Unavailable metrics represented explicitly as available false with note, not guessed \u2014 e.g., systemd.userspace 0 -> unavailable, thermal 0 -> unavailable",
-    "Reboot-pending: framework supports rebootMarker but P11 does not auto-capture after reboot \u2014 user must run polaris transaction compare after reboot (as done for P7 manual)",
-    "Boot vs login: distinguishes isBootCritical vs background, but login time (systemd-analyze --user 596ms) is not yet in PerformanceBaseline (only systemd.userspace system) \u2014 future could add userSystemd metric",
-    "Provider fragility: RealSystemdProvider still uses execv systemctl/systemd-analyze fallback, not yet sd-bus native; RealGpuProvider glxinfo DISPLAY=:0 hack fragile headless \u2014 should use libEGL native",
-    "Benchmark synthetic: BenchmarkEngine cpu_prime is micro-benchmark, not real workload \u2014 documented as prime compute 2..2000",
+    "Unavailable metrics represented explicitly as available false with note, not guessed — e.g., systemd.userspace 0 -> unavailable, thermal 0 -> unavailable",
+    "Reboot-pending: framework supports rebootMarker but P11 does not auto-capture after reboot — user must run polaris transaction compare after reboot (as done for P7 manual)",
+    "Boot vs login: distinguishes isBootCritical vs background, but login time (systemd-analyze --user 596ms) is not yet in PerformanceBaseline (only systemd.userspace system) — future could add userSystemd metric",
+    "Provider fragility: RealSystemdProvider still uses execv systemctl/systemd-analyze fallback, not yet sd-bus native; RealGpuProvider glxinfo DISPLAY=:0 hack fragile headless — should use libEGL native",
+    "Benchmark synthetic: BenchmarkEngine cpu_prime is micro-benchmark, not real workload — documented as prime compute 2..2000",
     "No helper installed: /run/polaris/helper.sock not exists (correct for P15, helper defined but not installed, tests use /tmp/polaris-test-root/p14/p15)",
-    "Not a git repo: no branch/commit \u2014 version is 0.1.0 P15 COMPLETED",
+    "Not a git repo: no branch/commit — version is 0.1.0 P15 COMPLETED",
     "No telemetry: offline-first, no external analytics",
-    "P12 generic preconditions mocked in tests \u2014 real host collection of service enabled/active, config hash, packageStateHash, kernelVersion not yet wired to CurrentState via Real providers (future)",
-    "P14 lock advisory not mandatory \u2014 TransactionLock flock tested, but not yet enforced in TransactionStore::apply for real /run/polaris/transaction.lock (future)",
-    "P14 recovery detection-only \u2014 detects BACKUP_CREATED/APPLYING but does not auto-validate or require approval (future)",
-    "P15 CI minimal \u2014 cmake --fresh, build, ctest only, no clang-tidy/sanitizers/coverage (future)",
-    "P15 validator fix for UNAVAILABLE \u2192 fail-closed (kernel/package/beforeHash empty where approved non-empty now correctly rejected)"
+    "P12 generic preconditions mocked in tests — real host collection of service enabled/active, config hash, packageStateHash, kernelVersion not yet wired to CurrentState via Real providers (future)",
+    "P14 lock advisory not mandatory — TransactionLock flock tested, but not yet enforced in TransactionStore::apply for real /run/polaris/transaction.lock (future)",
+    "P14 recovery detection-only — detects BACKUP_CREATED/APPLYING but does not auto-validate or require approval (future)",
+    "P15 CI minimal — cmake --fresh, build, ctest only, no clang-tidy/sanitizers/coverage (future)",
+    "P15 validator fix for UNAVAILABLE → fail-closed (kernel/package/beforeHash empty where approved non-empty now correctly rejected)",
+    "P19: Real flatpak collection on this host unavailable (flatpak not installed) -> flatpak-unused correctly NOT APPLICABLE (fixture proves 1.5GB would be RECOMMEND)",
+    "P19: Journal vacuum requiresAuth true but helper not installed (IpcProtocol ping/info only) -> real-host APPLY remains disabled until helper review, transaction stays PREVIEWED",
+    "P19: Legacy REC-006 static flatpak rec still emitted alongside registry REC-flatpak-unused (frozen legacy, future could deprecate)",
+    "P19: Comparison storage.free threshold 0.5GB initial, not tuned per-host"
   ],
   "nextAction": {
     "phase": null,
     "title": null,
-    "action": "STOP \u2014 PROJECT_COMPLETE_WITH_LIMITATIONS (no P19 justified, limitations documented, no worthwhile optimization, no regression, safety demonstrated)",
+    "action": "STOP — P19 capability framework complete, 38/38 tests, no privileged host mutation, registry deterministic, 2 reference caps proven on fixtures; no P20 justified unless privileged helper gap proven",
     "explicitApprovalRequired": false
   }
 }
