@@ -1,0 +1,188 @@
+# Polaris .gitignore — tailored for C++20 / CMake / Fedora / Qt (future) / Polaris runtime
+# See docs/SECURITY_AUDIT.md — no secrets, no host state, no build artifacts
+
+# ---- Build directories ----
+build/
+build-*/
+cmake-build-*/
+cmake-build-debug/
+cmake-build-release/
+out/
+_build/
+.cmake/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.ninja
+.ninja_*
+compile_commands.json
+CTestTestfile.cmake
+DartConfiguration.tcl
+Testing/
+CTestCostData.txt
+
+# ---- Compiled binaries / objects ----
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.ko
+*.xz
+# Polaris executables (built from CMake, in build/ — not source; build/ already ignored)
+# Kept here only for root-level stray binaries if ever built without build/ dir
+/polaris
+/polaris_real
+/polaris_p3
+/polaris_p4
+/polaris_p5
+/polaris_tests
+/test_*
+/test_real_providers
+/test_parsers
+/test_readonly
+/test_p4_security
+/test_comparison
+/test_post_change
+/test_regression
+/test_observed_benefit
+/test_p12_*
+/test_p13_*
+/test_p14_*
+/test_p15_*
+/test_p16_*
+/*.out
+
+# ---- CMake / packaging output ----
+*.deb
+*.rpm
+*.tar.gz
+*.tar.xz
+packaging/*.rpm
+packaging/*.deb
+_build/
+dist/
+
+# ---- Test / runtime state (must stay isolated) ----
+/tmp/polaris-test-root/
+polaris_test_root/
+*.log
+*.tmp.*
+*.tmp
+# Host-specific generated state (do not version machine-specific output)
+p2_scan.json
+p2_human.txt
+p3_analysis.json
+p3_report.txt
+p4_security_report.json
+p4_transaction_tests.json
+p5_transaction.json
+p6_mssql_analysis.json
+p6_additional_analysis.json
+nvidia_preflight.json
+p7_post_reboot.json
+p8_analysis.json
+p9_analysis.json
+# Any root-level JSON that is host-generated (keep docs/*.md, not root *.json)
+# Allow docs/*.json if ever needed, but ignore root host JSON
+/*.json
+!docs/**/*.json
+# Real Polaris runtime state (outside repo, but if ever copied inside, ignore)
+polaris_runtime/
+.local/
+backups/
+transactions/
+audit.log
+# Polaris user profile (real, not fixture)
+/home/
+# Runtime sockets / locks (never in repo)
+/run/polaris/
+*.sock
+*.lock
+
+# ---- Coverage / profiling ----
+*.gcda
+*.gcno
+*.gcov
+coverage/
+coverage.info
+*.prof
+*.gmon
+gmon.out
+perf.data
+perf.data.old
+callgrind.out.*
+massif.out.*
+
+# ---- IDE / editor ----
+# CLion
+.idea/
+cmake-build-*/
+# VS Code
+.vscode/
+*.code-workspace
+# Vim / Emacs
+*.swp
+*.swo
+*~
+\#*\#
+.\#*
+*.orig
+*.bak
+*.tmp
+# Kate
+*.kate-swp
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs/
+# KDevelop
+*.kdev4
+# Eclipse
+.c9/
+# JetBrains
+.idea/
+
+# ---- OS / Fedora / Linux ----
+.DS_Store
+Thumbs.db
+*~
+.nfs*
+.directory
+.Trash-*
+.fuse_hidden*
+# Fedora packaging
+*.src.rpm
+
+# ---- Qt (future gui/) ----
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.moc
+object_script.*.Release
+object_script.*.Debug
+
+# ---- Core dumps (do not ignore core/ directory) ----
+core.*
+vgcore.*
+*.core
+!core/
+!core/**
+
+# ---- Editor temporary ----
+*.swp
+*~
+
+# ---- Polaris specific (host-specific, never version) ----
+# Host backups if ever copied into repo (outside is ~/.local/state/polaris/backups)
+backups/
+# Real host NVIDIA/systemd output if ever dumped inside repo
+nvidia-smi.log
+# Benchmark output unless intentionally versioned
+benchmark-*.json

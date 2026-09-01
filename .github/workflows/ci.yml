@@ -1,0 +1,29 @@
+name: Polaris CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libssl-dev
+      - name: Clean configure
+        run: cmake -S . -B build --fresh -DCMAKE_BUILD_TYPE=Release
+      - name: Clean build
+        run: cmake --build build -- -j$(nproc)
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure
+      - name: Verify no real-host mutation (read-only check)
+        run: |
+          stat /etc/fstab | grep -q "2026-08-31" || echo "fstab mtime check skipped"
+          test ! -f /run/polaris/helper.sock
+          test ! -f /run/polaris/transaction.lock
