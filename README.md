@@ -2,6 +2,12 @@
 
 **Target:** Fedora Linux + KDE Plasma | **Version:** 0.1.0 | **Status:** P18 — Complete with limitations | **Tests:** 33/33 passing
 
+> **A note from the author — Mehran Qadirian**
+>
+> *"I wanted to optimize my Linux system, but I didn't want a tool that blindly disables services, runs random shell commands, or tells me a change is good just because a number got smaller."*
+>
+> *"So I built Polaris for myself — a safety-first, evidence-driven platform that measures the actual machine, explains what it found, and only changes the host after explicit approval, backup, and verification."*
+
 Polaris is a safety-first, evidence-driven tool to understand and improve Linux system health. It measures your real hardware, explains what it found, and only changes the system after you explicitly approve, with automatic backup and verification.
 
 > **Polaris is not** a blind debloat script. It never disables services automatically, never runs `curl | bash`, and never assumes "smaller number = better." Every recommendation requires evidence, and every change requires your approval.
