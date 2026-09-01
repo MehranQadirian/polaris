@@ -259,3 +259,4 @@ See `SECURITY.md` `SECURITY_AUDIT.md` (`P19` `SECRET_AUDIT: PASS` after `docs/P7
 
 *Built on actual Fedora KDE diagnostics 2026-08-31 to 2026-09-01, evidence for bottleneck & NVIDIA compat engines. CLI is primary interface; Qt GUI is future direction, `gui/` empty, `P10` `Qt6 Widgets/Quick as API client only` not implemented.*
 
+GUI coming soon
