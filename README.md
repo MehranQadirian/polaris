@@ -138,8 +138,8 @@ READ (polaris_real) → MEASURE (BaselineEngine 3812ms 15 metrics) → ANALYZE (
 
 **From source (Fedora 44, P18 `ci.yml`):**
 ```bash
-git clone https://github.com/MehranQadirian/lin-opt.git # or polaris (see GitHub repo name)
-cd lin-opt
+git clone https://github.com/MehranQadirian/polaris.git
+cd polaris
 cmake -S . -B build --fresh
 cmake --build build -- -j$(nproc)
 ctest --test-dir build --output-on-failure # 33/33 100%
